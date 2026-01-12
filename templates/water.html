@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Water Quality Monitoring - Pollution Control System">
+    <title>Water Quality Monitoring - Pollution Control System</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <span class="logo-icon">🌍</span>
+                    <h1>Pollution Monitor<small>Smart City System</small></h1>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="{{ url_for('air_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🌫️</span>
+                    <span class="nav-text">Air Pollution</span>
+                </a>
+                <a href="{{ url_for('water_pollution') }}" class="nav-item active">
+                    <span class="nav-icon">💧</span>
+                    <span class="nav-text">Water Pollution</span>
+                </a>
+                <a href="{{ url_for('noise_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🔊</span>
+                    <span class="nav-text">Noise Pollution</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <div class="header-content">
+                    <h1><i class="fas fa-water"></i> Water Quality Monitoring</h1>
+                    <p>Water quality analysis for <strong>{{ selected_city }}</strong></p>
+                </div>
+                <div class="header-actions">
+                    <div class="city-selector">
+                        <select id="citySelector" onchange="changeCity(this.value)">
+                            {% for city in cities %}
+                            <option value="{{ city.city }}" {% if city.city==selected_city %}selected{% endif %}>
+                                {{ city.city }}, {{ city.state }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i> Refresh Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Current Water Quality Status -->
+            <section class="water-status-section">
+                <div class="water-main-card {{ quality_info.label|lower if quality_info else 'safe' }}">
+                    <div class="water-quality-container">
+                        <div class="water-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="water-status">
+                            <div class="water-label">Current Water Quality</div>
+                            <div class="water-status-badge {{ quality_info.label|lower if quality_info else 'safe' }}">
+                                {{ quality_info.label if quality_info else 'Safe' }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="water-parameters">
+                        <div class="param-card">
+                            <div class="param-icon ph">
+                                <i class="fas fa-flask"></i>
+                            </div>
+                            <div class="param-info">
+                                <span class="param-label">pH Level</span>
+                                <span class="param-value">{{ latest.ph if latest else '7.2' }}</span>
+                                <span class="param-range">Safe: 6.5 - 8.5</span>
+                            </div>
+                        </div>
+                        <div class="param-card">
+                            <div class="param-icon turbidity">
+                                <i class="fas fa-eye-dropper"></i>
+                            </div>
+                            <div class="param-info">
+                                <span class="param-label">Turbidity</span>
+                                <span class="param-value">{{ latest.turbidity if latest else '2.5' }} NTU</span>
+                                <span class="param-range">Safe: < 5 NTU</span>
+                            </div>
+                        </div>
+                        <div class="param-card">
+                            <div class="param-icon dissolved-oxygen">
+                                <i class="fas fa-atom"></i>
+                            </div>
+                            <div class="param-info">
+                                <span class="param-label">Dissolved Oxygen</span>
+                                <span class="param-value">{{ latest.dissolved_oxygen if latest else '7.8' }} mg/L</span>
+                                <span class="param-range">Safe: > 6 mg/L</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Water Quality Legend -->
+            <section class="water-legend">
+                <div class="legend-item safe">
+                    <span class="legend-color"></span>
+                    <span class="legend-text">Safe - All parameters within limits</span>
+                </div>
+                <div class="legend-item moderate">
+                    <span class="legend-color"></span>
+                    <span class="legend-text">Moderate - One or more parameters near limits</span>
+                </div>
+                <div class="legend-item polluted">
+                    <span class="legend-color"></span>
+                    <span class="legend-text">Polluted - Parameters exceeding safe limits</span>
+                </div>
+            </section>
+
+            <!-- Prediction Form -->
+            <section class="prediction-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-chart-line"></i> Water Quality Prediction</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="prediction-form" class="prediction-form">
+                            <div class="form-group">
+                                <label for="ph">pH Level</label>
+                                <input type="number" id="ph" name="ph" step="0.1" min="0" max="14"
+                                    placeholder="Enter pH value (0-14)" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="turbidity">Turbidity (NTU)</label>
+                                <input type="number" id="turbidity" name="turbidity" step="0.1" min="0" max="100"
+                                    placeholder="Enter turbidity value" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dissolved_oxygen">Dissolved Oxygen (mg/L)</label>
+                                <input type="number" id="dissolved_oxygen" name="dissolved_oxygen" step="0.1" min="0"
+                                    max="20" placeholder="Enter DO value" required>
+                            </div>
+                        </form>
+                        <div class="text-center">
+                            <button type="submit" form="prediction-form" class="btn btn-primary btn-lg">
+                                <i class="fas fa-magic"></i> Analyze Water Quality
+                            </button>
+                        </div>
+                        <div id="prediction-result" class="prediction-result hidden">
+                            <div class="result-content">
+                                <h3>Analysis Result</h3>
+                                <div class="predicted-classification">
+                                    <span class="label">Water Quality:</span>
+                                    <span class="badge" id="predicted-classification-badge">--</span>
+                                </div>
+                                <div class="prediction-details" id="prediction-details">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-chart-line"></i> pH Trend</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="ph-trend-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-chart-bar"></i> Water Parameters</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="water-params-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Historical Data Table -->
+            <section class="data-table-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-table"></i> Recent Water Quality Data</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>pH</th>
+                                        <th>Turbidity</th>
+                                        <th>Dissolved O₂</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in water_data %}
+                                    <tr>
+                                        <td>{{ row.date }}</td>
+                                        <td>{{ row.ph }}</td>
+                                        <td>{{ row.turbidity }} NTU</td>
+                                        <td>{{ row.dissolved_oxygen }} mg/L</td>
+                                        <td>
+                                            <span
+                                                class="status-badge {{ row.quality|lower if row.quality else 'safe' }}">
+                                                {{ row.quality if row.quality else 'Safe' }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5" class="no-data">No data available</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <p>© 2026 Integrated Pollution Monitoring System | MCA Final Year Project</p>
+            </footer>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Water quality data from backend
+        const waterHistoryData = {{ chart_data| safe if chart_data else '[]' }};
+
+        // Initialize charts when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            if (waterHistoryData && waterHistoryData.length > 0) {
+                // pH Trend Chart  
+                const phCtx = document.getElementById('ph-trend-chart');
+                if (phCtx) {
+                    new Chart(phCtx, {
+                        type: 'line',
+                        data: {
+                            labels: waterHistoryData.map(d => d.date),
+                            datasets: [{
+                                label: 'pH Level',
+                                data: waterHistoryData.map(d => d.ph),
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top' }
+                            },
+                            scales: {
+                                y: {
+                                    min: 5,
+                                    max: 10,
+                                    title: { display: true, text: 'pH Level' }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Water Parameters Chart
+                const paramsCtx = document.getElementById('water-params-chart');
+                if (paramsCtx) {
+                    const recentData = waterHistoryData.slice(-7);
+                    new Chart(paramsCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: recentData.map(d => d.date),
+                            datasets: [
+                                {
+                                    label: 'Turbidity (NTU)',
+                                    data: recentData.map(d => d.turbidity),
+                                    backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                                    borderColor: '#f59e0b',
+                                    borderWidth: 1,
+                                    yAxisID: 'y'
+                                },
+                                {
+                                    label: 'Dissolved O₂ (mg/L)',
+                                    data: recentData.map(d => d.dissolved_oxygen),
+                                    backgroundColor: 'rgba(6, 182, 212, 0.7)',
+                                    borderColor: '#06b6d4',
+                                    borderWidth: 1,
+                                    yAxisID: 'y1'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top' }
+                            },
+                            scales: {
+                                y: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'left',
+                                    title: { display: true, text: 'Turbidity (NTU)' }
+                                },
+                                y1: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'right',
+                                    title: { display: true, text: 'DO (mg/L)' },
+                                    grid: { drawOnChartArea: false }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Handle prediction form submission
+            document.getElementById('prediction-form').addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const ph = parseFloat(document.getElementById('ph').value);
+                const turbidity = parseFloat(document.getElementById('turbidity').value);
+                const dissolved_oxygen = parseFloat(document.getElementById('dissolved_oxygen').value);
+
+                try {
+                    const response = await fetch('/api/predict/water', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ ph, turbidity, dissolved_oxygen })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const resultDiv = document.getElementById('prediction-result');
+                        const classificationBadge = document.getElementById('predicted-classification-badge');
+                        classificationBadge.textContent = data.quality;
+                        classificationBadge.className = 'badge ' + data.quality.toLowerCase();
+
+                        // Show details
+                        const detailsDiv = document.getElementById('prediction-details');
+                        detailsDiv.innerHTML = `
+                            <p><strong>pH Assessment:</strong> ${data.ph_status || 'Normal'}</p>
+                            <p><strong>Turbidity Assessment:</strong> ${data.turbidity_status || 'Normal'}</p>
+                            <p><strong>DO Assessment:</strong> ${data.do_status || 'Normal'}</p>
+                        `;
+
+                        resultDiv.classList.remove('hidden');
+                    } else {
+                        alert('Analysis failed: ' + data.error);
+                    }
+                } catch (error) {
+                    alert('Error making analysis: ' + error.message);
+                }
+            });
+        });
+
+        function refreshData() {
+            location.reload();
+        }
+
+        function changeCity(city) {
+            window.location.href = '/water?city=' + encodeURIComponent(city);
+        }
+    </script>
+</body>
+
+</html>

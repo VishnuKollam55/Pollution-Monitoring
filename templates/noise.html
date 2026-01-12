@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Noise Pollution Monitoring - Pollution Control System">
+    <title>Noise Pollution Monitoring - Pollution Control System</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <span class="logo-icon">🌍</span>
+                    <h1>Pollution Monitor<small>Smart City System</small></h1>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="{{ url_for('air_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🌫️</span>
+                    <span class="nav-text">Air Pollution</span>
+                </a>
+                <a href="{{ url_for('water_pollution') }}" class="nav-item">
+                    <span class="nav-icon">💧</span>
+                    <span class="nav-text">Water Pollution</span>
+                </a>
+                <a href="{{ url_for('noise_pollution') }}" class="nav-item active">
+                    <span class="nav-icon">🔊</span>
+                    <span class="nav-text">Noise Pollution</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <div class="header-content">
+                    <h1><i class="fas fa-volume-up"></i> Noise Pollution Monitoring</h1>
+                    <p>Noise level monitoring for <strong>{{ selected_city }}</strong></p>
+                </div>
+                <div class="header-actions">
+                    <div class="city-selector">
+                        <select id="citySelector" onchange="changeCity(this.value)">
+                            {% for city in cities %}
+                            <option value="{{ city.city }}" {% if city.city==selected_city %}selected{% endif %}>
+                                {{ city.city }}, {{ city.state }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i> Refresh Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Current Noise Level Status -->
+            <section class="noise-status-section">
+                <div class="noise-main-card {{ level_info.label|lower if level_info else 'medium' }}">
+                    <div class="noise-meter">
+                        <div class="meter-display">
+                            <div class="meter-value">{{ latest.sound_level if latest else '68' }}</div>
+                            <div class="meter-unit">dB</div>
+                        </div>
+                        <div class="meter-scale">
+                            <div class="scale-bar"
+                                style="width: {{ ((latest.sound_level if latest else 68) / 120) * 100 }}%"></div>
+                        </div>
+                        <div class="meter-labels">
+                            <span>0 dB</span>
+                            <span>60 dB</span>
+                            <span>85 dB</span>
+                            <span>120 dB</span>
+                        </div>
+                    </div>
+                    <div class="noise-info">
+                        <div class="noise-status-badge {{ level_info.label|lower if level_info else 'medium' }}">
+                            {{ level_info.label if level_info else 'Medium' }} Risk
+                        </div>
+                        <div class="noise-zone">
+                            <span class="zone-label">Zone Type:</span>
+                            <span class="zone-value">{{ latest.zone if latest else 'Commercial' }}</span>
+                        </div>
+                        <div class="noise-limit">
+                            <span class="limit-label">Permissible Limit:</span>
+                            <span class="limit-value">{{ zone_limits[latest.zone]['day'] if latest and latest.zone in
+                                zone_limits else '65' }} dB</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Noise Level Legend -->
+            <section class="noise-legend">
+                <div class="legend-item low">
+                    <span class="legend-color"></span>
+                    <span class="legend-text">Low Risk (< 55 dB)</span>
+                </div>
+                <div class="legend-item medium">
+                    <span class="legend-color"></span>
+                    <span class="legend-text">Medium Risk (55-75 dB)</span>
+                </div>
+                <div class="legend-item high">
+                    <span class="legend-color"></span>
+                    <span class="legend-text">High Risk (> 75 dB)</span>
+                </div>
+            </section>
+
+            <!-- Zone-wise Noise Standards -->
+            <section class="zone-standards-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-map-marked-alt"></i> Zone-wise Noise Standards (CPCB)</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="zone-grid">
+                            <div class="zone-card industrial">
+                                <div class="zone-icon">
+                                    <i class="fas fa-industry"></i>
+                                </div>
+                                <div class="zone-details">
+                                    <h4>Industrial Zone</h4>
+                                    <p>Day: 75 dB | Night: 70 dB</p>
+                                </div>
+                            </div>
+                            <div class="zone-card commercial">
+                                <div class="zone-icon">
+                                    <i class="fas fa-store"></i>
+                                </div>
+                                <div class="zone-details">
+                                    <h4>Commercial Zone</h4>
+                                    <p>Day: 65 dB | Night: 55 dB</p>
+                                </div>
+                            </div>
+                            <div class="zone-card residential">
+                                <div class="zone-icon">
+                                    <i class="fas fa-home"></i>
+                                </div>
+                                <div class="zone-details">
+                                    <h4>Residential Zone</h4>
+                                    <p>Day: 55 dB | Night: 45 dB</p>
+                                </div>
+                            </div>
+                            <div class="zone-card silence">
+                                <div class="zone-icon">
+                                    <i class="fas fa-hospital"></i>
+                                </div>
+                                <div class="zone-details">
+                                    <h4>Silence Zone</h4>
+                                    <p>Day: 50 dB | Night: 40 dB</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Prediction Form -->
+            <section class="prediction-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-chart-line"></i> Noise Risk Assessment</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="prediction-form" class="prediction-form">
+                            <div class="form-group">
+                                <label for="sound_level">Sound Level (dB)</label>
+                                <input type="number" id="sound_level" name="sound_level" step="0.1" min="0" max="150"
+                                    placeholder="Enter decibel value" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="zone">Zone Type</label>
+                                <select id="zone" name="zone" required>
+                                    <option value="">Select Zone</option>
+                                    <option value="Industrial">Industrial</option>
+                                    <option value="Commercial">Commercial</option>
+                                    <option value="Residential">Residential</option>
+                                    <option value="Silence">Silence Zone</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="time_of_day">Time Period</label>
+                                <select id="time_of_day" name="time_of_day" required>
+                                    <option value="">Select Time</option>
+                                    <option value="Day">Day (6 AM - 10 PM)</option>
+                                    <option value="Night">Night (10 PM - 6 AM)</option>
+                                </select>
+                            </div>
+                        </form>
+                        <div class="text-center">
+                            <button type="submit" form="prediction-form" class="btn btn-primary btn-lg">
+                                <i class="fas fa-magic"></i> Assess Noise Risk
+                            </button>
+                        </div>
+                        <div id="prediction-result" class="prediction-result hidden">
+                            <div class="result-content">
+                                <h3>Assessment Result</h3>
+                                <div class="predicted-risk">
+                                    <span class="label">Noise Risk Level:</span>
+                                    <span class="badge" id="predicted-risk-badge">--</span>
+                                </div>
+                                <div class="limit-info">
+                                    <span class="label">Zone Limit:</span>
+                                    <span class="value" id="zone-limit">--</span>
+                                </div>
+                                <div class="exceeded-info" id="exceeded-info">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-chart-line"></i> Noise Level Trend</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="noise-trend-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-chart-bar"></i> Zone-wise Comparison</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="zone-comparison-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Historical Data Table -->
+            <section class="data-table-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-table"></i> Recent Noise Level Data</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Decibel</th>
+                                        <th>Zone</th>
+                                        <th>Risk Level</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in noise_data %}
+                                    <tr>
+                                        <td>{{ row.date }}</td>
+                                        <td>{{ row.sound_level }} dB</td>
+                                        <td>{{ row.zone }}</td>
+                                        <td>
+                                            <span class="status-badge {{ row.level|lower if row.level else 'medium' }}">
+                                                {{ row.level if row.level else 'Medium' }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="4" class="no-data">No data available</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Zone Averages -->
+            {% if zone_averages %}
+            <section class="zone-stats-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-chart-pie"></i> Zone Statistics</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="zone-grid">
+                            {% for zone, stats in zone_averages.items() %}
+                            <div class="zone-card {{ zone|lower }}">
+                                <div class="zone-details">
+                                    <h4>{{ zone }}</h4>
+                                    <p>Avg: {{ stats.avg }} dB</p>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">Min: {{ stats.min }} | Max:
+                                        {{ stats.max }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Footer -->
+            <footer class="footer">
+                <p>© 2026 Integrated Pollution Monitoring System | MCA Final Year Project</p>
+            </footer>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Noise level specific data for charts - using chart_data from backend
+        const noiseHistoryData = {{ chart_data| safe if chart_data else '[]' }};
+        const zoneStandards = {
+            'Industrial': { day: 75, night: 70 },
+            'Commercial': { day: 65, night: 55 },
+            'Residential': { day: 55, night: 45 },
+            'Silence': { day: 50, night: 40 }
+        };
+
+        // Initialize charts when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize noise charts with correct data format
+            if (noiseHistoryData && noiseHistoryData.length > 0) {
+                // Noise Level Trend Chart
+                const trendCtx = document.getElementById('noise-trend-chart');
+                if (trendCtx) {
+                    new Chart(trendCtx, {
+                        type: 'line',
+                        data: {
+                            labels: noiseHistoryData.map(d => d.date),
+                            datasets: [{
+                                label: 'Sound Level (dB)',
+                                data: noiseHistoryData.map(d => d.sound_level),
+                                borderColor: '#9b59b6',
+                                backgroundColor: 'rgba(155, 89, 182, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointBackgroundColor: noiseHistoryData.map(d => {
+                                    if (d.sound_level < 55) return '#10b981';
+                                    if (d.sound_level < 75) return '#f59e0b';
+                                    return '#ef4444';
+                                })
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top' }
+                            },
+                            scales: {
+                                y: {
+                                    min: 0,
+                                    max: 120,
+                                    title: { display: true, text: 'Sound Level (dB)' }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Zone Comparison Chart
+                const zoneCtx = document.getElementById('zone-comparison-chart');
+                if (zoneCtx) {
+                    const zones = ['Industrial', 'Commercial', 'Residential'];
+                    const zoneData = zones.map(zone => {
+                        const zoneRecords = noiseHistoryData.filter(d => d.zone === zone);
+                        if (zoneRecords.length === 0) return 0;
+                        return zoneRecords.reduce((sum, d) => sum + d.sound_level, 0) / zoneRecords.length;
+                    });
+                    const zoneLimits = [75, 65, 55];
+
+                    new Chart(zoneCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: zones,
+                            datasets: [
+                                {
+                                    label: 'Average Level',
+                                    data: zoneData,
+                                    backgroundColor: 'rgba(155, 89, 182, 0.7)',
+                                    borderColor: '#9b59b6',
+                                    borderWidth: 1
+                                },
+                                {
+                                    label: 'Permissible Limit',
+                                    data: zoneLimits,
+                                    backgroundColor: 'rgba(16, 185, 129, 0.5)',
+                                    borderColor: '#10b981',
+                                    borderWidth: 1
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top' }
+                            },
+                            scales: {
+                                y: {
+                                    min: 0,
+                                    max: 100,
+                                    title: { display: true, text: 'Sound Level (dB)' }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Handle prediction form submission
+            document.getElementById('prediction-form').addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const sound_level = parseFloat(document.getElementById('sound_level').value);
+                const zone = document.getElementById('zone').value;
+                const time_of_day = document.getElementById('time_of_day').value;
+
+                try {
+                    const response = await fetch('/api/predict/noise', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ sound_level, zone, time_of_day })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const resultDiv = document.getElementById('prediction-result');
+                        const riskBadge = document.getElementById('predicted-risk-badge');
+                        riskBadge.textContent = data.level + ' Risk';
+                        riskBadge.className = 'badge ' + data.level.toLowerCase();
+
+                        // Calculate limit based on zone and time
+                        const zoneKey = zone === 'Silence Zone' ? 'Silence' : zone;
+                        const zoneLimit = zoneStandards[zoneKey] || { day: 65, night: 55 };
+                        const limit = time_of_day === 'Night' ? zoneLimit.night : zoneLimit.day;
+
+                        document.getElementById('zone-limit').textContent = limit + ' dB';
+
+                        const exceededInfo = document.getElementById('exceeded-info');
+                        const exceeded = sound_level > limit;
+                        const exceeded_by = sound_level - limit;
+
+                        if (exceeded) {
+                            exceededInfo.innerHTML = `
+                                <div class="exceeded-warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Noise level exceeds permissible limit by ${exceeded_by.toFixed(1)} dB
+                                </div>
+                            `;
+                        } else {
+                            exceededInfo.innerHTML = `
+                                <div class="within-limit">
+                                    <i class="fas fa-check-circle"></i>
+                                    Noise level is within permissible limits
+                                </div>
+                            `;
+                        }
+
+                        resultDiv.classList.remove('hidden');
+                    } else {
+                        alert('Assessment failed: ' + data.error);
+                    }
+                } catch (error) {
+                    alert('Error making assessment: ' + error.message);
+                }
+            });
+        });
+
+        function refreshData() {
+            location.reload();
+        }
+
+        function changeCity(city) {
+            window.location.href = '/noise?city=' + encodeURIComponent(city);
+        }
+    </script>
+</body>
+
+</html>

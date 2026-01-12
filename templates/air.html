@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Air Quality Monitoring - Pollution Control System">
+    <title>Air Quality Monitoring - Pollution Control System</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <span class="logo-icon">🌍</span>
+                    <h1>Pollution Monitor<small>Smart City System</small></h1>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="{{ url_for('air_pollution') }}" class="nav-item active">
+                    <span class="nav-icon">🌫️</span>
+                    <span class="nav-text">Air Pollution</span>
+                </a>
+                <a href="{{ url_for('water_pollution') }}" class="nav-item">
+                    <span class="nav-icon">💧</span>
+                    <span class="nav-text">Water Pollution</span>
+                </a>
+                <a href="{{ url_for('noise_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🔊</span>
+                    <span class="nav-text">Noise Pollution</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <div class="header-content">
+                    <h1><i class="fas fa-wind"></i> Air Quality Monitoring</h1>
+                    <p>Real-time air quality analysis for <strong>{{ selected_city }}</strong></p>
+                </div>
+                <div class="header-actions">
+                    <div class="city-selector">
+                        <select id="citySelector" onchange="changeCity(this.value)">
+                            {% for city in cities %}
+                            <option value="{{ city.city }}" {% if city.city==selected_city %}selected{% endif %}>
+                                {{ city.city }}, {{ city.state }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i> Refresh Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Current AQI Status -->
+            <section class="aqi-status-section">
+                <div class="aqi-main-card {{ aqi_info[0]|lower|replace(' ', '-') if aqi_info else 'moderate' }}">
+                    <div class="aqi-value-container">
+                        <div class="aqi-label">Current Air Quality Index</div>
+                        <div class="aqi-value">{{ latest_aqi if latest_aqi else '92' }}</div>
+                        <div
+                            class="aqi-status-badge {{ aqi_info[0]|lower|replace(' ', '-') if aqi_info else 'moderate' }}">
+                            {{ aqi_info[0] if aqi_info else 'Moderate' }}
+                        </div>
+                    </div>
+                    <div class="aqi-details">
+                        <div class="aqi-detail-item">
+                            <span class="detail-label">PM2.5</span>
+                            <span class="detail-value">{{ latest.pm25 if latest else '42' }} µg/m³</span>
+                        </div>
+                        <div class="aqi-detail-item">
+                            <span class="detail-label">PM10</span>
+                            <span class="detail-value">{{ latest.pm10 if latest else '68' }} µg/m³</span>
+                        </div>
+                        <div class="aqi-detail-item">
+                            <span class="detail-label">CO₂</span>
+                            <span class="detail-value">{{ latest.co2 if latest else '450' }} ppm</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AQI Legend -->
+            <section class="aqi-legend">
+                <div class="legend-item good">
+                    <span class="legend-color"></span>
+                    <span class="legend-text">Good (0-50)</span>
+                </div>
+                <div class="legend-item moderate">
+                    <span class="legend-color"></span>
+                    <span class="legend-text">Moderate (51-100)</span>
+                </div>
+                <div class="legend-item poor">
+                    <span class="legend-color"></span>
+                    <span class="legend-text">Poor (101-150)</span>
+                </div>
+                <div class="legend-item very-poor">
+                    <span class="legend-color"></span>
+                    <span class="legend-text">Very Poor (151-200)</span>
+                </div>
+                <div class="legend-item severe">
+                    <span class="legend-color"></span>
+                    <span class="legend-text">Severe (201+)</span>
+                </div>
+            </section>
+
+            <!-- Prediction Form -->
+            <section class="prediction-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-chart-line"></i> AQI Prediction</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="prediction-form" class="prediction-form">
+                            <div class="form-group">
+                                <label for="pm25">PM2.5 (µg/m³)</label>
+                                <input type="number" id="pm25" name="pm25" step="0.1" min="0" max="500"
+                                    placeholder="Enter PM2.5 value" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="pm10">PM10 (µg/m³)</label>
+                                <input type="number" id="pm10" name="pm10" step="0.1" min="0" max="500"
+                                    placeholder="Enter PM10 value" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="co2">CO₂ (ppm)</label>
+                                <input type="number" id="co2" name="co2" step="0.1" min="300" max="1000"
+                                    placeholder="Enter CO2 value" required>
+                            </div>
+                        </form>
+                        <div class="text-center">
+                            <button type="submit" form="prediction-form" class="btn btn-primary btn-lg">
+                                <i class="fas fa-magic"></i> Predict AQI
+                            </button>
+                        </div>
+                        <div id="prediction-result" class="prediction-result hidden">
+                            <div class="result-content">
+                                <h3>Prediction Result</h3>
+                                <div class="predicted-aqi">
+                                    <span class="label">Predicted AQI:</span>
+                                    <span class="value" id="predicted-aqi-value">--</span>
+                                </div>
+                                <div class="predicted-level">
+                                    <span class="label">Classification:</span>
+                                    <span class="badge" id="predicted-level-badge">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-chart-area"></i> Historical AQI Trend</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="aqi-trend-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-chart-bar"></i> Pollutant Comparison</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="pollutant-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Historical Data Table -->
+            <section class="data-table-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-table"></i> Recent Air Quality Data</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>PM2.5</th>
+                                        <th>PM10</th>
+                                        <th>CO₂</th>
+                                        <th>AQI</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in air_data %}
+                                    <tr>
+                                        <td>{{ row.date }}</td>
+                                        <td>{{ row.pm25 }} µg/m³</td>
+                                        <td>{{ row.pm10 }} µg/m³</td>
+                                        <td>{{ row.co2 }} ppm</td>
+                                        <td>{{ row.aqi }}</td>
+                                        <td>
+                                            <span
+                                                class="status-badge {{ row.level|lower|replace(' ', '-') if row.level else 'moderate' }}">
+                                                {{ row.level if row.level else 'Moderate' }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" class="no-data">No data available</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recommendations -->
+            {% if recommendations %}
+            <section class="recommendations-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-lightbulb"></i> Health Recommendations</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul class="recommendations-list">
+                            {% for rec in recommendations %}
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                {{ rec }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Footer -->
+            <footer class="footer">
+                <p>© 2026 Integrated Pollution Monitoring System | MCA Final Year Project</p>
+            </footer>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Air quality data from backend
+        const airHistoryData = {{ historical_data| safe if historical_data else '[]' }};
+        const predictedData = {{ predicted_data| safe if predicted_data else '[]' }};
+
+        // Initialize charts when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            if (airHistoryData && airHistoryData.length > 0) {
+                // AQI Trend Chart
+                const trendCtx = document.getElementById('aqi-trend-chart');
+                if (trendCtx) {
+                    new Chart(trendCtx, {
+                        type: 'line',
+                        data: {
+                            labels: airHistoryData.map(d => d.date),
+                            datasets: [{
+                                label: 'AQI',
+                                data: airHistoryData.map(d => d.aqi),
+                                borderColor: '#3498db',
+                                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointBackgroundColor: airHistoryData.map(d => {
+                                    if (d.aqi <= 50) return '#10b981';
+                                    if (d.aqi <= 100) return '#f59e0b';
+                                    if (d.aqi <= 150) return '#f97316';
+                                    if (d.aqi <= 200) return '#ef4444';
+                                    return '#991b1b';
+                                })
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top' }
+                            },
+                            scales: {
+                                y: {
+                                    min: 0,
+                                    max: 300,
+                                    title: { display: true, text: 'AQI Value' }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Pollutant Comparison Chart
+                const pollutantCtx = document.getElementById('pollutant-chart');
+                if (pollutantCtx) {
+                    const recentData = airHistoryData.slice(-7);
+                    new Chart(pollutantCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: recentData.map(d => d.date),
+                            datasets: [
+                                {
+                                    label: 'PM2.5',
+                                    data: recentData.map(d => d.pm25),
+                                    backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                                    borderColor: '#3498db',
+                                    borderWidth: 1
+                                },
+                                {
+                                    label: 'PM10',
+                                    data: recentData.map(d => d.pm10),
+                                    backgroundColor: 'rgba(155, 89, 182, 0.7)',
+                                    borderColor: '#9b59b6',
+                                    borderWidth: 1
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top' }
+                            },
+                            scales: {
+                                y: {
+                                    title: { display: true, text: 'Concentration (μg/m³)' }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Handle prediction form submission
+            document.getElementById('prediction-form').addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const pm25 = parseFloat(document.getElementById('pm25').value);
+                const pm10 = parseFloat(document.getElementById('pm10').value);
+                const co2 = parseFloat(document.getElementById('co2').value);
+
+                try {
+                    const response = await fetch('/api/predict/air', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ pm25, pm10, co2 })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const resultDiv = document.getElementById('prediction-result');
+                        document.getElementById('predicted-aqi-value').textContent = data.aqi.toFixed(0);
+                        const levelBadge = document.getElementById('predicted-level-badge');
+                        levelBadge.textContent = data.classification;
+                        levelBadge.className = 'badge ' + data.classification.toLowerCase().replace(' ', '-');
+                        resultDiv.classList.remove('hidden');
+                    } else {
+                        alert('Prediction failed: ' + data.error);
+                    }
+                } catch (error) {
+                    alert('Error making prediction: ' + error.message);
+                }
+            });
+        });
+
+        function refreshData() {
+            location.reload();
+        }
+
+        function changeCity(city) {
+            window.location.href = '/air?city=' + encodeURIComponent(city);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Integrated Pollution Monitoring and Control System - Smart City Dashboard">
+    <title>Pollution Monitoring System - Dashboard</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <span class="logo-icon">🌍</span>
+                    <h1>Pollution Monitor<small>Smart City System</small></h1>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="{{ url_for('air_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🌫️</span>
+                    <span class="nav-text">Air Pollution</span>
+                </a>
+                <a href="{{ url_for('water_pollution') }}" class="nav-item">
+                    <span class="nav-icon">💧</span>
+                    <span class="nav-text">Water Pollution</span>
+                </a>
+                <a href="{{ url_for('noise_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🔊</span>
+                    <span class="nav-text">Noise Pollution</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <header class="page-header">
+                <div>
+                    <h1 class="page-title">Pollution Monitoring Dashboard</h1>
+                    <p class="page-subtitle">Real-time pollution analysis for <strong>{{ selected_city }}</strong></p>
+                </div>
+                <div class="page-actions">
+                    <div class="city-selector">
+                        <select id="citySelector" onchange="changeCity(this.value)">
+                            {% for city in cities %}
+                            <option value="{{ city.city }}" {% if city.city==selected_city %}selected{% endif %}>
+                                {{ city.city }}, {{ city.state }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="current-time">
+                        <span>🕐</span>
+                        <span id="currentTime">Loading...</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Summary Cards -->
+            <section class="summary-grid">
+                <!-- Air Quality Card -->
+                <div class="summary-card air">
+                    <div class="summary-card-header">
+                        <span class="summary-card-title">Air Quality Index</span>
+                        <span class="summary-card-icon">🌫️</span>
+                    </div>
+                    {% if latest_air %}
+                    <div class="summary-card-value">{{ latest_air.aqi or 'N/A' }}</div>
+                    <div class="summary-card-label">
+                        <span
+                            class="status-badge {{ latest_air.level|lower|replace(' ', '-') if latest_air.level else 'moderate' }}">
+                            {{ latest_air.level or 'Calculating' }}
+                        </span>
+                    </div>
+                    {% else %}
+                    <div class="summary-card-value">--</div>
+                    <div class="summary-card-label">No data available</div>
+                    {% endif %}
+                    <div class="chart-container" style="height: 80px; margin-top: 15px;">
+                        <canvas id="airMiniChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Water Quality Card -->
+                <div class="summary-card water">
+                    <div class="summary-card-header">
+                        <span class="summary-card-title">Water Quality</span>
+                        <span class="summary-card-icon">💧</span>
+                    </div>
+                    {% if latest_water %}
+                    <div class="summary-card-value">pH {{ latest_water.ph }}</div>
+                    <div class="summary-card-label">
+                        <span
+                            class="status-badge {{ latest_water.quality|lower if latest_water.quality else 'moderate' }}">
+                            {{ latest_water.quality or 'Unknown' }}
+                        </span>
+                    </div>
+                    {% else %}
+                    <div class="summary-card-value">--</div>
+                    <div class="summary-card-label">No data available</div>
+                    {% endif %}
+                    <div class="chart-container" style="height: 80px; margin-top: 15px;">
+                        <canvas id="waterMiniChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Noise Level Card -->
+                <div class="summary-card noise">
+                    <div class="summary-card-header">
+                        <span class="summary-card-title">Noise Level</span>
+                        <span class="summary-card-icon">🔊</span>
+                    </div>
+                    {% if latest_noise %}
+                    <div class="summary-card-value">{{ latest_noise.sound_level }} dB</div>
+                    <div class="summary-card-label">
+                        <span class="status-badge {{ latest_noise.level|lower if latest_noise.level else 'medium' }}">
+                            {{ latest_noise.level or 'Unknown' }}
+                        </span>
+                        <span style="margin-left: 10px; color: var(--text-muted);">{{ latest_noise.zone }}</span>
+                    </div>
+                    {% else %}
+                    <div class="summary-card-value">--</div>
+                    <div class="summary-card-label">No data available</div>
+                    {% endif %}
+                    <div class="chart-container" style="height: 80px; margin-top: 15px;">
+                        <canvas id="noiseMiniChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Alerts Summary Card -->
+                <div class="summary-card alerts">
+                    <div class="summary-card-header">
+                        <span class="summary-card-title">Active Alerts</span>
+                        <span class="summary-card-icon">⚠️</span>
+                    </div>
+                    <div class="summary-card-value">{{ alert_summary.total }}</div>
+                    <div class="summary-card-label">
+                        {% if alert_summary.by_severity.CRITICAL > 0 %}
+                        <span class="status-badge severe">{{ alert_summary.by_severity.CRITICAL }} Critical</span>
+                        {% endif %}
+                        {% if alert_summary.by_severity.DANGER > 0 %}
+                        <span class="status-badge very-poor">{{ alert_summary.by_severity.DANGER }} Danger</span>
+                        {% endif %}
+                        {% if alert_summary.by_severity.WARNING > 0 %}
+                        <span class="status-badge moderate">{{ alert_summary.by_severity.WARNING }} Warning</span>
+                        {% endif %}
+                        {% if alert_summary.total == 0 %}
+                        <span class="status-badge good">All Clear</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Content Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Air Quality Trend Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-icon">📈</span>
+                            Air Quality Trend
+                        </h3>
+                        <a href="{{ url_for('air_pollution') }}" class="btn btn-sm btn-secondary">View Details</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="airTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alerts Panel -->
+                <div class="alerts-panel">
+                    <div class="alerts-header">
+                        <h3>🚨 Active Alerts</h3>
+                        <span class="alert-count">{{ alerts|length }} alerts</span>
+                    </div>
+                    <div class="alerts-list">
+                        {% if alerts %}
+                        {% for alert in alerts %}
+                        <div class="alert-item fade-in">
+                            <div class="alert-icon {{ alert.severity|lower }}">
+                                {% if alert.type == 'AIR' %}🌫️
+                                {% elif alert.type == 'WATER' %}💧
+                                {% else %}🔊{% endif %}
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">{{ alert.title }}</div>
+                                <div class="alert-message">{{ alert.message }}</div>
+                                <div class="alert-time">{{ alert.timestamp }}</div>
+                                {% if alert.recommendations %}
+                                <div class="alert-recommendations">
+                                    <h5>Recommendations:</h5>
+                                    <ul>
+                                        {% for rec in alert.recommendations[:3] %}
+                                        <li>{{ rec }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="no-alerts">
+                            <div class="no-alerts-icon">✅</div>
+                            <p>No active alerts. All pollution levels are within safe limits.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Water and Noise Charts Row -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                <!-- Water Quality Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-icon">💧</span>
+                            Water Quality Parameters
+                        </h3>
+                        <a href="{{ url_for('water_pollution') }}" class="btn btn-sm btn-secondary">View Details</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="waterTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Noise Levels Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-icon">🔊</span>
+                            Noise Levels by Zone
+                        </h3>
+                        <a href="{{ url_for('noise_pollution') }}" class="btn btn-sm btn-secondary">View Details</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="noiseTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer
+                style="text-align: center; padding: 30px 0; color: var(--text-muted); margin-top: 30px; border-top: 1px solid var(--border-color);">
+                <p>Integrated Pollution Monitoring and Control System &copy; 2026</p>
+                <p style="font-size: 0.85rem;">MCA Final Year Project - Smart City Initiative</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Parse chart data from Flask
+        const airChartData = {{ air_chart_data| safe }};
+        const waterChartData = {{ water_chart_data| safe }};
+        const noiseChartData = {{ noise_chart_data| safe }};
+
+        // Initialize charts when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            // Dashboard mini charts
+            renderDashboardCharts(airChartData, waterChartData, noiseChartData);
+
+            // Air trend chart
+            if (airChartData.length > 0) {
+                const airCtx = document.getElementById('airTrendChart');
+                if (airCtx) {
+                    new Chart(airCtx, {
+                        type: 'line',
+                        data: {
+                            labels: airChartData.map(d => d.date),
+                            datasets: [{
+                                label: 'AQI',
+                                data: airChartData.map(d => d.aqi),
+                                borderColor: '#3498db',
+                                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top' }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Water trend chart
+            if (waterChartData.length > 0) {
+                const waterCtx = document.getElementById('waterTrendChart');
+                if (waterCtx) {
+                    new Chart(waterCtx, {
+                        type: 'line',
+                        data: {
+                            labels: waterChartData.map(d => d.date),
+                            datasets: [
+                                {
+                                    label: 'pH',
+                                    data: waterChartData.map(d => d.ph),
+                                    borderColor: '#2ecc71',
+                                    borderWidth: 2,
+                                    fill: false,
+                                    tension: 0.4
+                                },
+                                {
+                                    label: 'DO (mg/L)',
+                                    data: waterChartData.map(d => d.dissolved_oxygen),
+                                    borderColor: '#3498db',
+                                    borderWidth: 2,
+                                    fill: false,
+                                    tension: 0.4
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top' }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Noise trend chart
+            if (noiseChartData.length > 0) {
+                const noiseCtx = document.getElementById('noiseTrendChart');
+                if (noiseCtx) {
+                    const colors = noiseChartData.map(d => {
+                        if (d.sound_level < 55) return '#28a745';
+                        if (d.sound_level < 75) return '#ffc107';
+                        return '#dc3545';
+                    });
+
+                    new Chart(noiseCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: noiseChartData.map(d => d.date),
+                            datasets: [{
+                                label: 'Sound Level (dB)',
+                                data: noiseChartData.map(d => d.sound_level),
+                                backgroundColor: colors,
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top' }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 120
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        // City change function
+        function changeCity(city) {
+            window.location.href = '/?city=' + encodeURIComponent(city);
+        }
+    </script>
+</body>
+
+</html>
