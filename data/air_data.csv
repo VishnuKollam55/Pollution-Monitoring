@@ -1,0 +1,43 @@
+date,city,state,pm25,pm10,co2,aqi,level
+2026-01-01,Mumbai,Maharashtra,35,55,420,78,Good
+2026-01-01,Delhi,Delhi,85,130,535,178,Very Poor
+2026-01-01,Bangalore,Karnataka,28,45,395,62,Good
+2026-01-01,Chennai,Tamil Nadu,42,68,450,95,Moderate
+2026-01-01,Kolkata,West Bengal,55,85,480,125,Moderate
+2026-01-01,Hyderabad,Telangana,38,62,430,88,Moderate
+2026-01-02,Mumbai,Maharashtra,42,68,450,95,Moderate
+2026-01-02,Delhi,Delhi,95,145,550,195,Very Poor
+2026-01-02,Bangalore,Karnataka,32,50,405,68,Good
+2026-01-02,Chennai,Tamil Nadu,48,75,465,108,Moderate
+2026-01-02,Kolkata,West Bengal,62,95,495,142,Poor
+2026-01-02,Hyderabad,Telangana,44,70,445,102,Moderate
+2026-01-03,Mumbai,Maharashtra,55,85,480,125,Moderate
+2026-01-03,Delhi,Delhi,120,180,600,245,Severe
+2026-01-03,Bangalore,Karnataka,30,48,400,65,Good
+2026-01-03,Chennai,Tamil Nadu,52,82,475,118,Moderate
+2026-01-03,Kolkata,West Bengal,72,110,520,158,Poor
+2026-01-03,Hyderabad,Telangana,48,78,460,112,Moderate
+2026-01-04,Mumbai,Maharashtra,65,100,500,145,Poor
+2026-01-04,Delhi,Delhi,110,165,580,225,Severe
+2026-01-04,Bangalore,Karnataka,25,42,392,58,Good
+2026-01-04,Chennai,Tamil Nadu,45,72,455,105,Moderate
+2026-01-04,Kolkata,West Bengal,78,120,535,168,Very Poor
+2026-01-04,Hyderabad,Telangana,52,85,478,122,Moderate
+2026-01-05,Mumbai,Maharashtra,48,75,460,108,Moderate
+2026-01-05,Delhi,Delhi,92,140,545,188,Very Poor
+2026-01-05,Bangalore,Karnataka,28,46,398,60,Good
+2026-01-05,Chennai,Tamil Nadu,40,65,440,92,Moderate
+2026-01-05,Kolkata,West Bengal,68,105,510,152,Poor
+2026-01-05,Hyderabad,Telangana,45,72,455,105,Moderate
+2026-01-06,Mumbai,Maharashtra,38,60,435,85,Moderate
+2026-01-06,Delhi,Delhi,75,115,520,162,Very Poor
+2026-01-06,Bangalore,Karnataka,22,38,385,52,Good
+2026-01-06,Chennai,Tamil Nadu,36,58,425,82,Moderate
+2026-01-06,Kolkata,West Bengal,58,90,490,135,Poor
+2026-01-06,Hyderabad,Telangana,40,65,440,92,Moderate
+2026-01-07,Mumbai,Maharashtra,32,52,420,72,Good
+2026-01-07,Delhi,Delhi,68,105,505,148,Poor
+2026-01-07,Bangalore,Karnataka,20,35,380,48,Good
+2026-01-07,Chennai,Tamil Nadu,32,52,410,72,Good
+2026-01-07,Kolkata,West Bengal,52,82,478,120,Moderate
+2026-01-07,Hyderabad,Telangana,35,58,428,80,Moderate

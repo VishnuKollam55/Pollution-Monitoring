@@ -1,0 +1,43 @@
+date,city,state,zone,sound_level,level
+2026-01-01,Mumbai,Maharashtra,Residential,45,Low
+2026-01-01,Delhi,Delhi,Commercial,68,Medium
+2026-01-01,Bangalore,Karnataka,Residential,38,Low
+2026-01-01,Chennai,Tamil Nadu,Commercial,58,Medium
+2026-01-01,Kolkata,West Bengal,Industrial,78,High
+2026-01-01,Hyderabad,Telangana,Residential,42,Low
+2026-01-02,Mumbai,Maharashtra,Commercial,62,Medium
+2026-01-02,Delhi,Delhi,Industrial,85,High
+2026-01-02,Bangalore,Karnataka,Residential,40,Low
+2026-01-02,Chennai,Tamil Nadu,Commercial,60,Medium
+2026-01-02,Kolkata,West Bengal,Industrial,82,High
+2026-01-02,Hyderabad,Telangana,Commercial,55,Medium
+2026-01-03,Mumbai,Maharashtra,Industrial,72,Medium
+2026-01-03,Delhi,Delhi,Industrial,92,High
+2026-01-03,Bangalore,Karnataka,Commercial,52,Medium
+2026-01-03,Chennai,Tamil Nadu,Residential,48,Low
+2026-01-03,Kolkata,West Bengal,Industrial,88,High
+2026-01-03,Hyderabad,Telangana,Commercial,58,Medium
+2026-01-04,Mumbai,Maharashtra,Residential,48,Low
+2026-01-04,Delhi,Delhi,Industrial,90,High
+2026-01-04,Bangalore,Karnataka,Residential,42,Low
+2026-01-04,Chennai,Tamil Nadu,Commercial,62,Medium
+2026-01-04,Kolkata,West Bengal,Commercial,70,Medium
+2026-01-04,Hyderabad,Telangana,Residential,45,Low
+2026-01-05,Mumbai,Maharashtra,Commercial,58,Medium
+2026-01-05,Delhi,Delhi,Commercial,72,Medium
+2026-01-05,Bangalore,Karnataka,Commercial,48,Low
+2026-01-05,Chennai,Tamil Nadu,Industrial,75,High
+2026-01-05,Kolkata,West Bengal,Industrial,85,High
+2026-01-05,Hyderabad,Telangana,Commercial,55,Medium
+2026-01-06,Mumbai,Maharashtra,Residential,42,Low
+2026-01-06,Delhi,Delhi,Industrial,88,High
+2026-01-06,Bangalore,Karnataka,Residential,35,Low
+2026-01-06,Chennai,Tamil Nadu,Commercial,56,Medium
+2026-01-06,Kolkata,West Bengal,Industrial,80,High
+2026-01-06,Hyderabad,Telangana,Residential,40,Low
+2026-01-07,Mumbai,Maharashtra,Commercial,55,Medium
+2026-01-07,Delhi,Delhi,Commercial,65,Medium
+2026-01-07,Bangalore,Karnataka,Residential,38,Low
+2026-01-07,Chennai,Tamil Nadu,Residential,45,Low
+2026-01-07,Kolkata,West Bengal,Commercial,68,Medium
+2026-01-07,Hyderabad,Telangana,Commercial,52,Medium
