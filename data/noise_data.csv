@@ -1,43 +1,81 @@
-date,city,state,zone,sound_level,level
-2026-01-01,Mumbai,Maharashtra,Residential,45,Low
-2026-01-01,Delhi,Delhi,Commercial,68,Medium
-2026-01-01,Bangalore,Karnataka,Residential,38,Low
-2026-01-01,Chennai,Tamil Nadu,Commercial,58,Medium
-2026-01-01,Kolkata,West Bengal,Industrial,78,High
-2026-01-01,Hyderabad,Telangana,Residential,42,Low
-2026-01-02,Mumbai,Maharashtra,Commercial,62,Medium
-2026-01-02,Delhi,Delhi,Industrial,85,High
-2026-01-02,Bangalore,Karnataka,Residential,40,Low
-2026-01-02,Chennai,Tamil Nadu,Commercial,60,Medium
-2026-01-02,Kolkata,West Bengal,Industrial,82,High
-2026-01-02,Hyderabad,Telangana,Commercial,55,Medium
-2026-01-03,Mumbai,Maharashtra,Industrial,72,Medium
-2026-01-03,Delhi,Delhi,Industrial,92,High
-2026-01-03,Bangalore,Karnataka,Commercial,52,Medium
-2026-01-03,Chennai,Tamil Nadu,Residential,48,Low
-2026-01-03,Kolkata,West Bengal,Industrial,88,High
-2026-01-03,Hyderabad,Telangana,Commercial,58,Medium
-2026-01-04,Mumbai,Maharashtra,Residential,48,Low
-2026-01-04,Delhi,Delhi,Industrial,90,High
-2026-01-04,Bangalore,Karnataka,Residential,42,Low
-2026-01-04,Chennai,Tamil Nadu,Commercial,62,Medium
-2026-01-04,Kolkata,West Bengal,Commercial,70,Medium
-2026-01-04,Hyderabad,Telangana,Residential,45,Low
-2026-01-05,Mumbai,Maharashtra,Commercial,58,Medium
-2026-01-05,Delhi,Delhi,Commercial,72,Medium
-2026-01-05,Bangalore,Karnataka,Commercial,48,Low
-2026-01-05,Chennai,Tamil Nadu,Industrial,75,High
-2026-01-05,Kolkata,West Bengal,Industrial,85,High
-2026-01-05,Hyderabad,Telangana,Commercial,55,Medium
-2026-01-06,Mumbai,Maharashtra,Residential,42,Low
-2026-01-06,Delhi,Delhi,Industrial,88,High
-2026-01-06,Bangalore,Karnataka,Residential,35,Low
-2026-01-06,Chennai,Tamil Nadu,Commercial,56,Medium
-2026-01-06,Kolkata,West Bengal,Industrial,80,High
-2026-01-06,Hyderabad,Telangana,Residential,40,Low
-2026-01-07,Mumbai,Maharashtra,Commercial,55,Medium
-2026-01-07,Delhi,Delhi,Commercial,65,Medium
-2026-01-07,Bangalore,Karnataka,Residential,38,Low
-2026-01-07,Chennai,Tamil Nadu,Residential,45,Low
-2026-01-07,Kolkata,West Bengal,Commercial,68,Medium
-2026-01-07,Hyderabad,Telangana,Commercial,52,Medium
+date,city,state,sound_level,zone,level
+2026-01-01,Mumbai,Maharashtra,68,Commercial,Medium
+2026-01-01,Delhi,Delhi,78,Commercial,High
+2026-01-01,Bangalore,Karnataka,62,Residential,Medium
+2026-01-01,Chennai,Tamil Nadu,65,Commercial,Medium
+2026-01-01,Kolkata,West Bengal,72,Commercial,Medium
+2026-01-01,Hyderabad,Telangana,64,Commercial,Medium
+2026-01-01,Pune,Maharashtra,58,Residential,Medium
+2026-01-01,Ahmedabad,Gujarat,70,Commercial,Medium
+2026-01-01,Jaipur,Rajasthan,66,Commercial,Medium
+2026-01-01,Lucknow,Uttar Pradesh,68,Commercial,Medium
+2026-01-01,Kanpur,Uttar Pradesh,75,Industrial,High
+2026-01-01,Nagpur,Maharashtra,55,Residential,Low
+2026-01-01,Visakhapatnam,Andhra Pradesh,62,Commercial,Medium
+2026-01-01,Bhopal,Madhya Pradesh,58,Residential,Medium
+2026-01-01,Patna,Bihar,72,Commercial,Medium
+2026-01-01,Indore,Madhya Pradesh,60,Commercial,Medium
+2026-01-01,Surat,Gujarat,68,Industrial,Medium
+2026-01-01,Kochi,Kerala,52,Residential,Low
+2026-01-01,Coimbatore,Tamil Nadu,55,Residential,Low
+2026-01-01,Guwahati,Assam,58,Commercial,Medium
+2026-01-01,Chandigarh,Punjab,50,Residential,Low
+2026-01-01,Thiruvananthapuram,Kerala,48,Residential,Low
+2026-01-01,Ranchi,Jharkhand,62,Commercial,Medium
+2026-01-01,Shimla,Himachal Pradesh,42,Silence,Low
+2026-01-01,Noida,Uttar Pradesh,72,Commercial,Medium
+2026-01-01,Gurugram,Haryana,75,Commercial,High
+2026-01-02,Mumbai,Maharashtra,72,Commercial,Medium
+2026-01-02,Delhi,Delhi,82,Commercial,High
+2026-01-02,Bangalore,Karnataka,65,Commercial,Medium
+2026-01-02,Chennai,Tamil Nadu,68,Commercial,Medium
+2026-01-02,Kolkata,West Bengal,75,Commercial,High
+2026-01-02,Hyderabad,Telangana,68,Commercial,Medium
+2026-01-02,Pune,Maharashtra,62,Residential,Medium
+2026-01-02,Ahmedabad,Gujarat,72,Industrial,Medium
+2026-01-02,Jaipur,Rajasthan,70,Commercial,Medium
+2026-01-02,Lucknow,Uttar Pradesh,72,Commercial,Medium
+2026-01-02,Kanpur,Uttar Pradesh,78,Industrial,High
+2026-01-02,Nagpur,Maharashtra,58,Residential,Medium
+2026-01-02,Visakhapatnam,Andhra Pradesh,65,Commercial,Medium
+2026-01-02,Bhopal,Madhya Pradesh,62,Commercial,Medium
+2026-01-02,Patna,Bihar,75,Commercial,High
+2026-01-02,Indore,Madhya Pradesh,64,Commercial,Medium
+2026-01-02,Surat,Gujarat,70,Industrial,Medium
+2026-01-02,Kochi,Kerala,55,Residential,Low
+2026-01-02,Coimbatore,Tamil Nadu,58,Residential,Medium
+2026-01-02,Guwahati,Assam,62,Commercial,Medium
+2026-01-02,Chandigarh,Punjab,52,Residential,Low
+2026-01-02,Thiruvananthapuram,Kerala,50,Residential,Low
+2026-01-02,Ranchi,Jharkhand,65,Commercial,Medium
+2026-01-02,Varanasi,Uttar Pradesh,72,Commercial,Medium
+2026-01-02,Agra,Uttar Pradesh,68,Commercial,Medium
+2026-01-02,Noida,Uttar Pradesh,75,Commercial,High
+2026-01-02,Gurugram,Haryana,78,Commercial,High
+2026-01-03,Mumbai,Maharashtra,75,Commercial,High
+2026-01-03,Delhi,Delhi,85,Commercial,High
+2026-01-03,Bangalore,Karnataka,68,Commercial,Medium
+2026-01-03,Chennai,Tamil Nadu,70,Commercial,Medium
+2026-01-03,Kolkata,West Bengal,78,Industrial,High
+2026-01-03,Hyderabad,Telangana,70,Commercial,Medium
+2026-01-03,Pune,Maharashtra,65,Commercial,Medium
+2026-01-03,Ahmedabad,Gujarat,75,Industrial,High
+2026-01-03,Jaipur,Rajasthan,72,Commercial,Medium
+2026-01-03,Lucknow,Uttar Pradesh,75,Commercial,High
+2026-01-03,Kanpur,Uttar Pradesh,82,Industrial,High
+2026-01-03,Nagpur,Maharashtra,60,Residential,Medium
+2026-01-03,Visakhapatnam,Andhra Pradesh,68,Commercial,Medium
+2026-01-03,Bhopal,Madhya Pradesh,65,Commercial,Medium
+2026-01-03,Patna,Bihar,78,Commercial,High
+2026-01-03,Indore,Madhya Pradesh,68,Commercial,Medium
+2026-01-03,Surat,Gujarat,72,Industrial,Medium
+2026-01-03,Kochi,Kerala,58,Residential,Medium
+2026-01-03,Coimbatore,Tamil Nadu,60,Residential,Medium
+2026-01-03,Mangalore,Karnataka,52,Residential,Low
+2026-01-03,Mysore,Karnataka,50,Residential,Low
+2026-01-03,Udaipur,Rajasthan,55,Residential,Low
+2026-01-03,Ludhiana,Punjab,72,Industrial,Medium
+2026-01-03,Amritsar,Punjab,68,Commercial,Medium
+2026-01-03,Meerut,Uttar Pradesh,70,Commercial,Medium
+2026-01-03,Faridabad,Haryana,75,Industrial,High
+2026-01-03,Ghaziabad,Uttar Pradesh,78,Industrial,High

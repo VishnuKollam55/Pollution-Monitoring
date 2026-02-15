@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Settings - Pollution Monitoring System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .settings-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .settings-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 20px 0;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .settings-card h3 .icon {
+            font-size: 1.3rem;
+        }
+
+        .threshold-group {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .threshold-group:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .threshold-group h4 {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 12px 0;
+        }
+
+        .threshold-row {
+            display: grid;
+            grid-template-columns: 1fr 120px 80px;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .threshold-label {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .threshold-input {
+            padding: 8px 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .threshold-input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .threshold-unit {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .toggle-row:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-info h5 {
+            margin: 0 0 4px 0;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .toggle-info p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(100, 116, 139, 0.5);
+            border-radius: 28px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        input:checked+.toggle-slider {
+            background: linear-gradient(135deg, #059669, #10b981);
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-reset {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-left: 12px;
+        }
+
+        .btn-reset:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #f87171;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 24px;
+        }
+
+        .alert {
+            padding: 14px 20px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #fcd34d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <span class="logo-icon">🌍</span>
+                    <h1>Pollution Monitor<small>Admin Panel</small></h1>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="{{ url_for('air_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🌫️</span>
+                    <span class="nav-text">Air Pollution</span>
+                </a>
+                <a href="{{ url_for('water_pollution') }}" class="nav-item">
+                    <span class="nav-icon">💧</span>
+                    <span class="nav-text">Water Pollution</span>
+                </a>
+                <a href="{{ url_for('noise_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🔊</span>
+                    <span class="nav-text">Noise Pollution</span>
+                </a>
+                <a href="{{ url_for('admin_settings') }}" class="nav-item active">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <div>
+                    <h1 class="page-title">⚙️ System Settings</h1>
+                    <p class="page-subtitle">Configure alert thresholds, notifications, and system preferences</p>
+                </div>
+                <div class="page-actions">
+                    {% if current_user %}
+                    <span style="color: var(--text-secondary);">👤 {{ current_user.username }}</span>
+                    {% endif %}
+                </div>
+            </header>
+
+            {% if success %}
+            <div class="alert alert-success">
+                <span>✅</span> {{ success }}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('admin_settings') }}">
+                <div class="settings-grid">
+                    <!-- Air Quality Thresholds -->
+                    <div class="settings-card">
+                        <h3><span class="icon">🌫️</span> Air Quality Thresholds</h3>
+
+                        <div class="threshold-group">
+                            <h4>AQI Levels</h4>
+                            <div class="threshold-row">
+                                <span class="threshold-label">Warning Level</span>
+                                <input type="number" class="threshold-input" name="aqi_warning"
+                                    value="{{ thresholds.aqi.warning }}">
+                                <span class="threshold-unit">AQI</span>
+                            </div>
+                            <div class="threshold-row">
+                                <span class="threshold-label">Danger Level</span>
+                                <input type="number" class="threshold-input" name="aqi_danger"
+                                    value="{{ thresholds.aqi.danger }}">
+                                <span class="threshold-unit">AQI</span>
+                            </div>
+                            <div class="threshold-row">
+                                <span class="threshold-label">Critical Level</span>
+                                <input type="number" class="threshold-input" name="aqi_critical"
+                                    value="{{ thresholds.aqi.critical }}">
+                                <span class="threshold-unit">AQI</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Water Quality Thresholds -->
+                    <div class="settings-card">
+                        <h3><span class="icon">💧</span> Water Quality Thresholds</h3>
+
+                        <div class="threshold-group">
+                            <h4>pH Levels</h4>
+                            <div class="threshold-row">
+                                <span class="threshold-label">Minimum Safe pH</span>
+                                <input type="number" step="0.1" class="threshold-input" name="ph_min"
+                                    value="{{ thresholds.ph.low_danger }}">
+                                <span class="threshold-unit">pH</span>
+                            </div>
+                            <div class="threshold-row">
+                                <span class="threshold-label">Maximum Safe pH</span>
+                                <input type="number" step="0.1" class="threshold-input" name="ph_max"
+                                    value="{{ thresholds.ph.high_danger }}">
+                                <span class="threshold-unit">pH</span>
+                            </div>
+                        </div>
+
+                        <div class="threshold-group">
+                            <h4>Turbidity</h4>
+                            <div class="threshold-row">
+                                <span class="threshold-label">Warning Level</span>
+                                <input type="number" class="threshold-input" name="turbidity_warning"
+                                    value="{{ thresholds.turbidity.warning }}">
+                                <span class="threshold-unit">NTU</span>
+                            </div>
+                            <div class="threshold-row">
+                                <span class="threshold-label">Danger Level</span>
+                                <input type="number" class="threshold-input" name="turbidity_danger"
+                                    value="{{ thresholds.turbidity.danger }}">
+                                <span class="threshold-unit">NTU</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Noise Thresholds -->
+                    <div class="settings-card">
+                        <h3><span class="icon">🔊</span> Noise Level Thresholds</h3>
+
+                        <div class="threshold-group">
+                            <h4>General Limits</h4>
+                            <div class="threshold-row">
+                                <span class="threshold-label">Warning Level</span>
+                                <input type="number" class="threshold-input" name="noise_warning"
+                                    value="{{ thresholds.noise.warning }}">
+                                <span class="threshold-unit">dB</span>
+                            </div>
+                            <div class="threshold-row">
+                                <span class="threshold-label">Danger Level</span>
+                                <input type="number" class="threshold-input" name="noise_danger"
+                                    value="{{ thresholds.noise.danger }}">
+                                <span class="threshold-unit">dB</span>
+                            </div>
+                            <div class="threshold-row">
+                                <span class="threshold-label">Critical Level</span>
+                                <input type="number" class="threshold-input" name="noise_critical"
+                                    value="{{ thresholds.noise.critical }}">
+                                <span class="threshold-unit">dB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notification Settings -->
+                    <div class="settings-card">
+                        <h3><span class="icon">🔔</span> Notification Settings</h3>
+
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <h5>Email Alerts</h5>
+                                <p>Send email notifications for critical alerts</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="email_alerts" {{ 'checked' if settings.email_alerts else ''
+                                    }}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <h5>Browser Notifications</h5>
+                                <p>Show browser push notifications</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="browser_notifications" {{ 'checked' if
+                                    settings.browser_notifications else '' }}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <h5>Daily Reports</h5>
+                                <p>Send daily pollution summary email</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="daily_reports" {{ 'checked' if settings.daily_reports
+                                    else '' }}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <h5>Real-time Data</h5>
+                                <p>Fetch live data from external APIs</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="realtime_data" {{ 'checked' if settings.realtime_data
+                                    else '' }}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <button type="button" class="btn-reset"
+                        onclick="if(confirm('Reset all settings to defaults?')) window.location.href='{{ url_for('admin_settings') }}?reset=1'">
+                        Reset to Defaults
+                    </button>
+                    <button type="submit" class="btn-save">
+                        💾 Save Settings
+                    </button>
+                </div>
+            </form>
+        </main>
+    </div>
+</body>
+
+</html>

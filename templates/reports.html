@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Pollution Monitoring System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .report-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+
+        .report-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .report-card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .report-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .report-icon.air {
+            background: linear-gradient(135deg, #0891b2, #06b6d4);
+        }
+
+        .report-icon.water {
+            background: linear-gradient(135deg, #059669, #10b981);
+        }
+
+        .report-icon.noise {
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+        }
+
+        .report-icon.combined {
+            background: linear-gradient(135deg, #4338ca, #6366f1);
+        }
+
+        .report-card h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.15rem;
+        }
+
+        .report-card p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin: 4px 0 0 0;
+        }
+
+        .report-options {
+            margin-bottom: 24px;
+        }
+
+        .option-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .option-group {
+            flex: 1;
+        }
+
+        .option-group label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .option-group select,
+        .option-group input {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .option-group select option {
+            background: var(--bg-secondary);
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-report {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: white;
+        }
+
+        .btn-csv {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+        }
+
+        .btn-report:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .recent-reports {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .recent-reports h3 {
+            margin: 0 0 20px 0;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .report-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .report-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .report-list li:last-child {
+            border-bottom: none;
+        }
+
+        .report-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .report-type-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .report-type-badge.pdf {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .report-type-badge.csv {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+        }
+
+        .report-meta {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .btn-download {
+            padding: 8px 16px;
+            background: rgba(99, 102, 241, 0.2);
+            border: none;
+            border-radius: 8px;
+            color: #818cf8;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-download:hover {
+            background: rgba(99, 102, 241, 0.3);
+        }
+
+        .comparison-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 24px;
+        }
+
+        .comparison-section h3 {
+            margin: 0 0 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .city-compare-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .city-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .city-checkbox:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .city-checkbox input {
+            width: 18px;
+            height: 18px;
+            accent-color: #6366f1;
+        }
+
+        .city-checkbox label {
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <span class="logo-icon">🌍</span>
+                    <h1>Pollution Monitor<small>Smart City System</small></h1>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="{{ url_for('air_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🌫️</span>
+                    <span class="nav-text">Air Pollution</span>
+                </a>
+                <a href="{{ url_for('water_pollution') }}" class="nav-item">
+                    <span class="nav-icon">💧</span>
+                    <span class="nav-text">Water Pollution</span>
+                </a>
+                <a href="{{ url_for('noise_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🔊</span>
+                    <span class="nav-text">Noise Pollution</span>
+                </a>
+                <a href="{{ url_for('reports') }}" class="nav-item active">
+                    <span class="nav-icon">📄</span>
+                    <span class="nav-text">Reports</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <div>
+                    <h1 class="page-title">📄 Generate Reports</h1>
+                    <p class="page-subtitle">Export pollution data as PDF or CSV for analysis and documentation</p>
+                </div>
+            </header>
+
+            <!-- City Comparison -->
+            <div class="comparison-section">
+                <h3>📊 Compare Cities</h3>
+                <form method="GET" action="{{ url_for('compare_cities') }}">
+                    <div class="city-compare-grid">
+                        {% for city in cities %}
+                        <div class="city-checkbox">
+                            <input type="checkbox" name="cities" value="{{ city.city }}" id="city_{{ city.city }}">
+                            <label for="city_{{ city.city }}">{{ city.city }}, {{ city.state }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn-report btn-pdf" style="max-width: 250px;">
+                        <span>📊</span> Compare Selected Cities
+                    </button>
+                </form>
+            </div>
+
+            <!-- Report Cards -->
+            <div class="reports-grid">
+                <!-- Air Quality Report -->
+                <div class="report-card">
+                    <div class="report-card-header">
+                        <div class="report-icon air">🌫️</div>
+                        <div>
+                            <h3>Air Quality Report</h3>
+                            <p>AQI, PM2.5, PM10, CO2 levels</p>
+                        </div>
+                    </div>
+                    <form action="{{ url_for('download_report') }}" method="POST">
+                        <input type="hidden" name="report_type" value="air">
+                        <div class="report-options">
+                            <div class="option-row">
+                                <div class="option-group">
+                                    <label>City</label>
+                                    <select name="city">
+                                        <option value="">All Cities</option>
+                                        {% for city in cities %}
+                                        <option value="{{ city.city }}">{{ city.city }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="option-group">
+                                    <label>Date Range</label>
+                                    <select name="date_range">
+                                        <option value="7">Last 7 Days</option>
+                                        <option value="30">Last 30 Days</option>
+                                        <option value="all">All Data</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button type="submit" name="format" value="pdf" class="btn-report btn-pdf">
+                                <span>📕</span> PDF
+                            </button>
+                            <button type="submit" name="format" value="csv" class="btn-report btn-csv">
+                                <span>📗</span> CSV
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Water Quality Report -->
+                <div class="report-card">
+                    <div class="report-card-header">
+                        <div class="report-icon water">💧</div>
+                        <div>
+                            <h3>Water Quality Report</h3>
+                            <p>pH, Turbidity, Dissolved Oxygen</p>
+                        </div>
+                    </div>
+                    <form action="{{ url_for('download_report') }}" method="POST">
+                        <input type="hidden" name="report_type" value="water">
+                        <div class="report-options">
+                            <div class="option-row">
+                                <div class="option-group">
+                                    <label>City</label>
+                                    <select name="city">
+                                        <option value="">All Cities</option>
+                                        {% for city in cities %}
+                                        <option value="{{ city.city }}">{{ city.city }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="option-group">
+                                    <label>Date Range</label>
+                                    <select name="date_range">
+                                        <option value="7">Last 7 Days</option>
+                                        <option value="30">Last 30 Days</option>
+                                        <option value="all">All Data</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button type="submit" name="format" value="pdf" class="btn-report btn-pdf">
+                                <span>📕</span> PDF
+                            </button>
+                            <button type="submit" name="format" value="csv" class="btn-report btn-csv">
+                                <span>📗</span> CSV
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Noise Report -->
+                <div class="report-card">
+                    <div class="report-card-header">
+                        <div class="report-icon noise">🔊</div>
+                        <div>
+                            <h3>Noise Level Report</h3>
+                            <p>Sound levels by zone</p>
+                        </div>
+                    </div>
+                    <form action="{{ url_for('download_report') }}" method="POST">
+                        <input type="hidden" name="report_type" value="noise">
+                        <div class="report-options">
+                            <div class="option-row">
+                                <div class="option-group">
+                                    <label>City</label>
+                                    <select name="city">
+                                        <option value="">All Cities</option>
+                                        {% for city in cities %}
+                                        <option value="{{ city.city }}">{{ city.city }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="option-group">
+                                    <label>Date Range</label>
+                                    <select name="date_range">
+                                        <option value="7">Last 7 Days</option>
+                                        <option value="30">Last 30 Days</option>
+                                        <option value="all">All Data</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button type="submit" name="format" value="pdf" class="btn-report btn-pdf">
+                                <span>📕</span> PDF
+                            </button>
+                            <button type="submit" name="format" value="csv" class="btn-report btn-csv">
+                                <span>📗</span> CSV
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Combined Report -->
+                <div class="report-card">
+                    <div class="report-card-header">
+                        <div class="report-icon combined">📊</div>
+                        <div>
+                            <h3>Combined Report</h3>
+                            <p>All pollution data summary</p>
+                        </div>
+                    </div>
+                    <form action="{{ url_for('download_report') }}" method="POST">
+                        <input type="hidden" name="report_type" value="combined">
+                        <div class="report-options">
+                            <div class="option-row">
+                                <div class="option-group">
+                                    <label>City</label>
+                                    <select name="city">
+                                        <option value="">All Cities</option>
+                                        {% for city in cities %}
+                                        <option value="{{ city.city }}">{{ city.city }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="option-group">
+                                    <label>Date Range</label>
+                                    <select name="date_range">
+                                        <option value="7">Last 7 Days</option>
+                                        <option value="30">Last 30 Days</option>
+                                        <option value="all">All Data</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button type="submit" name="format" value="pdf" class="btn-report btn-pdf">
+                                <span>📕</span> PDF
+                            </button>
+                            <button type="submit" name="format" value="csv" class="btn-report btn-csv">
+                                <span>📗</span> CSV
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer
+                style="text-align: center; padding: 24px 0; color: var(--text-muted); border-top: 1px solid var(--border-color);">
+                <p>Integrated Pollution Monitoring and Control System © 2026</p>
+            </footer>
+        </main>
+    </div>
+</body>
+
+</html>

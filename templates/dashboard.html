@@ -50,6 +50,18 @@
                     <span class="nav-icon">🔊</span>
                     <span class="nav-text">Noise Pollution</span>
                 </a>
+                <a href="{{ url_for('compare_page') }}" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">City Comparison</span>
+                </a>
+                <a href="{{ url_for('analytics') }}" class="nav-item">
+                    <span class="nav-icon">📉</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="{{ url_for('reports') }}" class="nav-item">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">Reports</span>
+                </a>
             </nav>
         </aside>
 
@@ -59,9 +71,16 @@
             <header class="page-header">
                 <div>
                     <h1 class="page-title">Pollution Monitoring Dashboard</h1>
-                    <p class="page-subtitle">Real-time pollution analysis for <strong>{{ selected_city }}</strong></p>
+                    <p class="page-subtitle">Real-time pollution analysis for <strong id="currentLocationName">{{
+                            selected_city }}</strong></p>
                 </div>
                 <div class="page-actions">
+                    <!-- Location Button -->
+                    <button id="locationBtn" class="btn btn-location" onclick="getMyLocation()"
+                        title="Get pollution data for your current location">
+                        <span id="locationIcon">📍</span>
+                        <span id="locationBtnText">Use My Location</span>
+                    </button>
                     <div class="city-selector">
                         <select id="citySelector" onchange="changeCity(this.value)">
                             {% for city in cities %}
@@ -77,6 +96,49 @@
                     </div>
                 </div>
             </header>
+
+            <!-- Location Pollution Card (hidden by default) -->
+            <div id="locationPollutionCard" class="location-pollution-card" style="display: none;">
+                <div class="location-card-header">
+                    <h3>📍 Your Location - Real-time Air Quality</h3>
+                    <button class="close-btn" onclick="hideLocationCard()">✕</button>
+                </div>
+                <div class="location-card-body">
+                    <div class="location-info">
+                        <span id="locationCoords"></span>
+                    </div>
+                    <div class="location-aqi-display">
+                        <div class="aqi-value-box" id="locationAqiBox">
+                            <span class="aqi-number" id="locationAqi">--</span>
+                            <span class="aqi-label" id="locationAqiLevel">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="location-pollutants">
+                        <div class="pollutant-item">
+                            <span class="pollutant-label">PM2.5</span>
+                            <span class="pollutant-value" id="locationPm25">--</span>
+                            <span class="pollutant-unit">μg/m³</span>
+                        </div>
+                        <div class="pollutant-item">
+                            <span class="pollutant-label">PM10</span>
+                            <span class="pollutant-value" id="locationPm10">--</span>
+                            <span class="pollutant-unit">μg/m³</span>
+                        </div>
+                        <div class="pollutant-item">
+                            <span class="pollutant-label">NO₂</span>
+                            <span class="pollutant-value" id="locationNo2">--</span>
+                            <span class="pollutant-unit">μg/m³</span>
+                        </div>
+                        <div class="pollutant-item">
+                            <span class="pollutant-label">O₃</span>
+                            <span class="pollutant-value" id="locationO3">--</span>
+                            <span class="pollutant-unit">μg/m³</span>
+                        </div>
+                    </div>
+                    <div class="health-advisory" id="healthAdvisory"></div>
+                    <div class="location-timestamp" id="locationTimestamp"></div>
+                </div>
+            </div>
 
             <!-- Summary Cards -->
             <section class="summary-grid">
@@ -400,7 +462,399 @@
         function changeCity(city) {
             window.location.href = '/?city=' + encodeURIComponent(city);
         }
+
+        // ==========================================
+        // GEOLOCATION FUNCTIONS
+        // ==========================================
+
+        /**
+         * Get user's current location and fetch pollution data
+         */
+        function getMyLocation() {
+            const btn = document.getElementById('locationBtn');
+            const btnText = document.getElementById('locationBtnText');
+            const icon = document.getElementById('locationIcon');
+
+            // Check if geolocation is supported
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser. Please use a modern browser.');
+                return;
+            }
+
+            // Update button to loading state
+            btn.disabled = true;
+            icon.textContent = '⏳';
+            btnText.textContent = 'Getting Location...';
+            btn.classList.add('loading');
+
+            // Request location
+            navigator.geolocation.getCurrentPosition(
+                // Success callback
+                function (position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    console.log('Location obtained:', lat, lon);
+
+                    btnText.textContent = 'Fetching Data...';
+                    fetchLocationPollution(lat, lon);
+                },
+                // Error callback
+                function (error) {
+                    btn.disabled = false;
+                    icon.textContent = '📍';
+                    btnText.textContent = 'Use My Location';
+                    btn.classList.remove('loading');
+
+                    let message = 'Unable to get your location. ';
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            message += 'Please allow location access in your browser settings.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            message += 'Location information is unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            message += 'Location request timed out.';
+                            break;
+                        default:
+                            message += 'An unknown error occurred.';
+                    }
+                    alert(message);
+                },
+                // Options
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        /**
+         * Fetch pollution data for given coordinates
+         */
+        async function fetchLocationPollution(lat, lon) {
+            const btn = document.getElementById('locationBtn');
+            const btnText = document.getElementById('locationBtnText');
+            const icon = document.getElementById('locationIcon');
+
+            try {
+                const response = await fetch(`/api/location-pollution?lat=${lat}&lon=${lon}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    updateLocationUI(data);
+                    btn.classList.remove('loading');
+                    btn.classList.add('active');
+                    icon.textContent = '✓';
+                    btnText.textContent = 'Location Active';
+                } else {
+                    throw new Error(data.error || 'Failed to fetch pollution data');
+                }
+            } catch (error) {
+                console.error('Error fetching location pollution:', error);
+                alert('Failed to fetch pollution data for your location. Please try again.');
+
+                icon.textContent = '📍';
+                btnText.textContent = 'Use My Location';
+                btn.classList.remove('loading');
+            }
+
+            btn.disabled = false;
+        }
+
+        /**
+         * Update UI with location pollution data
+         */
+        function updateLocationUI(data) {
+            // Show the location card
+            const card = document.getElementById('locationPollutionCard');
+            card.style.display = 'block';
+            card.classList.add('fade-in');
+
+            // Update location name
+            document.getElementById('currentLocationName').textContent = data.location_name || 'Your Location';
+
+            // Update coordinates
+            const coords = data.coordinates;
+            document.getElementById('locationCoords').textContent =
+                `📍 ${coords.lat.toFixed(4)}°N, ${coords.lon.toFixed(4)}°E`;
+
+            // Update AQI display
+            const aqi = data.aqi || 0;
+            const aqiLevel = data.aqi_level || 'Unknown';
+            document.getElementById('locationAqi').textContent = aqi;
+            document.getElementById('locationAqiLevel').textContent = aqiLevel;
+
+            // Set AQI box color
+            const aqiBox = document.getElementById('locationAqiBox');
+            if (data.health_advisory && data.health_advisory.color) {
+                aqiBox.style.backgroundColor = data.health_advisory.color;
+            }
+
+            // Update pollutant values
+            document.getElementById('locationPm25').textContent = data.pm25 || '--';
+            document.getElementById('locationPm10').textContent = data.pm10 || '--';
+            document.getElementById('locationNo2').textContent = data.no2 || '--';
+            document.getElementById('locationO3').textContent = data.o3 || '--';
+
+            // Update health advisory
+            const advisory = data.health_advisory;
+            if (advisory) {
+                const advisoryHtml = `
+                    <div class="advisory-message" style="border-left: 4px solid ${advisory.color};">
+                        <strong>${advisory.level}:</strong> ${advisory.message}
+                        ${advisory.precautions && advisory.precautions.length > 0 ? `
+                            <ul class="precautions-list">
+                                ${advisory.precautions.map(p => `<li>${p}</li>`).join('')}
+                            </ul>
+                        ` : ''}
+                    </div>
+                `;
+                document.getElementById('healthAdvisory').innerHTML = advisoryHtml;
+            }
+
+            // Update timestamp
+            document.getElementById('locationTimestamp').textContent =
+                `Last updated: ${data.timestamp} | Source: ${data.source}`;
+
+            // Scroll to the card
+            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        /**
+         * Hide location pollution card
+         */
+        function hideLocationCard() {
+            const card = document.getElementById('locationPollutionCard');
+            card.style.display = 'none';
+
+            // Reset button
+            const btn = document.getElementById('locationBtn');
+            const btnText = document.getElementById('locationBtnText');
+            const icon = document.getElementById('locationIcon');
+
+            btn.classList.remove('active');
+            icon.textContent = '📍';
+            btnText.textContent = 'Use My Location';
+
+            // Reset location name to selected city
+            const citySelector = document.getElementById('citySelector');
+            document.getElementById('currentLocationName').textContent = citySelector.value;
+        }
     </script>
+
+    <!-- Location Feature Styles -->
+    <style>
+        .btn-location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-location:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-location:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-location.loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        .btn-location.active {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .location-pollution-card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .location-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .location-card-header h3 {
+            color: #fff;
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .location-info {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .location-aqi-display {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .location-aqi-display .aqi-value-box {
+            padding: 20px 40px;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .location-aqi-display .aqi-number {
+            display: block;
+            font-size: 3rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .location-aqi-display .aqi-label {
+            display: block;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .location-pollutants {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .pollutant-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .pollutant-label {
+            display: block;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .pollutant-value {
+            display: block;
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .pollutant-unit {
+            display: block;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+        }
+
+        .health-advisory {
+            margin-bottom: 15px;
+        }
+
+        .advisory-message {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .precautions-list {
+            margin: 10px 0 0 20px;
+            padding: 0;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .precautions-list li {
+            margin: 5px 0;
+        }
+
+        .location-timestamp {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .location-pollutants {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .btn-location span:last-child {
+                display: none;
+            }
+        }
+    </style>
 </body>
 
 </html>

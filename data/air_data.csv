@@ -5,39 +5,101 @@ date,city,state,pm25,pm10,co2,aqi,level
 2026-01-01,Chennai,Tamil Nadu,42,68,450,95,Moderate
 2026-01-01,Kolkata,West Bengal,55,85,480,125,Moderate
 2026-01-01,Hyderabad,Telangana,38,62,430,88,Moderate
+2026-01-01,Pune,Maharashtra,32,52,410,72,Good
+2026-01-01,Ahmedabad,Gujarat,48,78,460,112,Moderate
+2026-01-01,Jaipur,Rajasthan,58,92,490,138,Poor
+2026-01-01,Lucknow,Uttar Pradesh,68,105,520,155,Poor
+2026-01-01,Kanpur,Uttar Pradesh,72,115,530,162,Poor
+2026-01-01,Nagpur,Maharashtra,30,48,400,65,Good
+2026-01-01,Visakhapatnam,Andhra Pradesh,34,55,415,75,Good
+2026-01-01,Bhopal,Madhya Pradesh,42,68,445,98,Moderate
+2026-01-01,Patna,Bihar,65,100,510,148,Poor
+2026-01-01,Indore,Madhya Pradesh,38,62,430,88,Moderate
+2026-01-01,Vadodara,Gujarat,40,65,440,92,Moderate
+2026-01-01,Surat,Gujarat,45,72,455,105,Moderate
+2026-01-01,Kochi,Kerala,22,38,375,48,Good
+2026-01-01,Coimbatore,Tamil Nadu,28,46,395,62,Good
+2026-01-01,Guwahati,Assam,35,58,420,80,Good
+2026-01-01,Chandigarh,Punjab,52,82,475,120,Moderate
+2026-01-01,Thiruvananthapuram,Kerala,20,35,368,45,Good
+2026-01-01,Ranchi,Jharkhand,45,72,455,105,Moderate
+2026-01-01,Gwalior,Madhya Pradesh,55,88,485,128,Moderate
+2026-01-01,Vijayawada,Andhra Pradesh,38,62,430,88,Moderate
+2026-01-01,Mysore,Karnataka,25,42,385,55,Good
+2026-01-01,Raipur,Chhattisgarh,48,78,462,112,Moderate
+2026-01-01,Bhubaneswar,Odisha,32,52,408,72,Good
+2026-01-01,Dehradun,Uttarakhand,28,45,392,62,Good
+2026-01-01,Amritsar,Punjab,58,92,492,138,Poor
+2026-01-01,Varanasi,Uttar Pradesh,70,108,525,158,Poor
+2026-01-01,Agra,Uttar Pradesh,62,98,505,145,Poor
+2026-01-01,Jodhpur,Rajasthan,52,85,478,122,Moderate
+2026-01-01,Madurai,Tamil Nadu,30,50,402,68,Good
+2026-01-01,Noida,Uttar Pradesh,78,120,540,172,Very Poor
+2026-01-01,Gurugram,Haryana,75,115,532,168,Very Poor
+2026-01-01,Faridabad,Haryana,70,110,525,162,Poor
+2026-01-01,Ghaziabad,Uttar Pradesh,80,125,545,178,Very Poor
 2026-01-02,Mumbai,Maharashtra,42,68,450,95,Moderate
 2026-01-02,Delhi,Delhi,95,145,550,195,Very Poor
 2026-01-02,Bangalore,Karnataka,32,50,405,68,Good
 2026-01-02,Chennai,Tamil Nadu,48,75,465,108,Moderate
 2026-01-02,Kolkata,West Bengal,62,95,495,142,Poor
 2026-01-02,Hyderabad,Telangana,44,70,445,102,Moderate
+2026-01-02,Pune,Maharashtra,38,60,425,85,Moderate
+2026-01-02,Ahmedabad,Gujarat,52,85,475,122,Moderate
+2026-01-02,Jaipur,Rajasthan,62,98,502,145,Poor
+2026-01-02,Lucknow,Uttar Pradesh,72,112,535,165,Poor
+2026-01-02,Kanpur,Uttar Pradesh,78,120,545,172,Very Poor
+2026-01-02,Nagpur,Maharashtra,35,55,415,78,Good
+2026-01-02,Visakhapatnam,Andhra Pradesh,38,60,425,82,Moderate
+2026-01-02,Bhopal,Madhya Pradesh,48,75,458,110,Moderate
+2026-01-02,Patna,Bihar,70,108,525,158,Poor
+2026-01-02,Indore,Madhya Pradesh,42,68,445,98,Moderate
+2026-01-02,Vadodara,Gujarat,45,72,455,105,Moderate
+2026-01-02,Surat,Gujarat,50,80,470,118,Moderate
+2026-01-02,Kochi,Kerala,25,42,385,55,Good
+2026-01-02,Coimbatore,Tamil Nadu,32,52,408,72,Good
+2026-01-02,Guwahati,Assam,38,62,430,88,Moderate
+2026-01-02,Chandigarh,Punjab,58,90,488,135,Poor
+2026-01-02,Thiruvananthapuram,Kerala,22,38,375,50,Good
+2026-01-02,Ranchi,Jharkhand,50,80,470,118,Moderate
+2026-01-02,Shimla,Himachal Pradesh,18,32,360,42,Good
+2026-01-02,Panaji,Goa,24,40,380,52,Good
+2026-01-02,Jammu,Jammu and Kashmir,42,68,445,98,Moderate
+2026-01-02,Srinagar,Jammu and Kashmir,38,62,432,88,Moderate
+2026-01-02,Noida,Uttar Pradesh,82,128,552,182,Very Poor
+2026-01-02,Gurugram,Haryana,78,122,545,175,Very Poor
+2026-01-02,Faridabad,Haryana,75,118,538,168,Very Poor
+2026-01-02,Ghaziabad,Uttar Pradesh,85,132,558,188,Very Poor
 2026-01-03,Mumbai,Maharashtra,55,85,480,125,Moderate
 2026-01-03,Delhi,Delhi,120,180,600,245,Severe
 2026-01-03,Bangalore,Karnataka,30,48,400,65,Good
 2026-01-03,Chennai,Tamil Nadu,52,82,475,118,Moderate
 2026-01-03,Kolkata,West Bengal,72,110,520,158,Poor
 2026-01-03,Hyderabad,Telangana,48,78,460,112,Moderate
-2026-01-04,Mumbai,Maharashtra,65,100,500,145,Poor
-2026-01-04,Delhi,Delhi,110,165,580,225,Severe
-2026-01-04,Bangalore,Karnataka,25,42,392,58,Good
-2026-01-04,Chennai,Tamil Nadu,45,72,455,105,Moderate
-2026-01-04,Kolkata,West Bengal,78,120,535,168,Very Poor
-2026-01-04,Hyderabad,Telangana,52,85,478,122,Moderate
-2026-01-05,Mumbai,Maharashtra,48,75,460,108,Moderate
-2026-01-05,Delhi,Delhi,92,140,545,188,Very Poor
-2026-01-05,Bangalore,Karnataka,28,46,398,60,Good
-2026-01-05,Chennai,Tamil Nadu,40,65,440,92,Moderate
-2026-01-05,Kolkata,West Bengal,68,105,510,152,Poor
-2026-01-05,Hyderabad,Telangana,45,72,455,105,Moderate
-2026-01-06,Mumbai,Maharashtra,38,60,435,85,Moderate
-2026-01-06,Delhi,Delhi,75,115,520,162,Very Poor
-2026-01-06,Bangalore,Karnataka,22,38,385,52,Good
-2026-01-06,Chennai,Tamil Nadu,36,58,425,82,Moderate
-2026-01-06,Kolkata,West Bengal,58,90,490,135,Poor
-2026-01-06,Hyderabad,Telangana,40,65,440,92,Moderate
-2026-01-07,Mumbai,Maharashtra,32,52,420,72,Good
-2026-01-07,Delhi,Delhi,68,105,505,148,Poor
-2026-01-07,Bangalore,Karnataka,20,35,380,48,Good
-2026-01-07,Chennai,Tamil Nadu,32,52,410,72,Good
-2026-01-07,Kolkata,West Bengal,52,82,478,120,Moderate
-2026-01-07,Hyderabad,Telangana,35,58,428,80,Moderate
+2026-01-03,Pune,Maharashtra,42,68,440,95,Moderate
+2026-01-03,Ahmedabad,Gujarat,55,90,485,128,Moderate
+2026-01-03,Jaipur,Rajasthan,68,105,515,152,Poor
+2026-01-03,Lucknow,Uttar Pradesh,78,120,550,172,Very Poor
+2026-01-03,Kanpur,Uttar Pradesh,85,130,560,185,Very Poor
+2026-01-03,Nagpur,Maharashtra,38,60,425,85,Moderate
+2026-01-03,Visakhapatnam,Andhra Pradesh,42,68,442,95,Moderate
+2026-01-03,Bhopal,Madhya Pradesh,52,82,472,120,Moderate
+2026-01-03,Patna,Bihar,75,115,535,168,Very Poor
+2026-01-03,Indore,Madhya Pradesh,45,72,455,105,Moderate
+2026-01-03,Vadodara,Gujarat,48,78,465,112,Moderate
+2026-01-03,Surat,Gujarat,55,88,482,128,Moderate
+2026-01-03,Kochi,Kerala,28,45,392,60,Good
+2026-01-03,Coimbatore,Tamil Nadu,35,55,420,78,Good
+2026-01-03,Guwahati,Assam,42,68,445,95,Moderate
+2026-01-03,Chandigarh,Punjab,62,95,500,142,Poor
+2026-01-03,Thiruvananthapuram,Kerala,25,42,380,55,Good
+2026-01-03,Kolhapur,Maharashtra,32,52,408,72,Good
+2026-01-03,Mangalore,Karnataka,28,46,395,62,Good
+2026-01-03,Udaipur,Rajasthan,45,72,455,105,Moderate
+2026-01-03,Jalandhar,Punjab,58,92,490,135,Poor
+2026-01-03,Ludhiana,Punjab,62,98,502,145,Poor
+2026-01-03,Meerut,Uttar Pradesh,72,112,528,162,Poor
+2026-01-03,Noida,Uttar Pradesh,88,138,565,192,Very Poor
+2026-01-03,Gurugram,Haryana,82,130,555,185,Very Poor
+2026-01-03,Faridabad,Haryana,80,125,550,180,Very Poor
+2026-01-03,Ghaziabad,Uttar Pradesh,90,142,572,198,Very Poor

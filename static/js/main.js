@@ -975,3 +975,233 @@ window.predictNoiseLevel = predictNoiseLevel;
 window.initAirCharts = initAirCharts;
 window.initWaterCharts = initWaterCharts;
 window.initNoiseCharts = initNoiseCharts;
+
+// ==========================================
+// REAL-TIME DATA FUNCTIONS
+// ==========================================
+
+/**
+ * Fetch real-time pollution data for a city
+ */
+async function fetchRealtimeData(city) {
+    try {
+        const response = await fetch(`/api/realtime/${city}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching realtime data:', error);
+        return null;
+    }
+}
+
+/**
+ * Fetch pollution forecast for a city
+ */
+async function fetchForecast(city) {
+    try {
+        const response = await fetch(`/api/forecast/${city}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching forecast:', error);
+        return null;
+    }
+}
+
+/**
+ * Refresh dashboard with real-time data
+ */
+async function refreshDashboard() {
+    const citySelector = document.getElementById('citySelector');
+    if (!citySelector) return;
+
+    const city = citySelector.value;
+    const data = await fetchRealtimeData(city);
+
+    if (data) {
+        // Update AQI display if exists
+        const aqiValue = document.querySelector('.summary-card.air .summary-card-value');
+        if (aqiValue && data.aqi) {
+            aqiValue.textContent = data.aqi;
+        }
+
+        // Show notification if AQI is high
+        if (data.aqi > 150) {
+            showBrowserNotification('Air Quality Alert',
+                `AQI in ${city} is ${data.aqi} (${data.aqi_level}). Consider staying indoors.`);
+        }
+
+        console.log(`Dashboard refreshed for ${city}:`, data);
+    }
+}
+
+/**
+ * Auto-refresh data every 5 minutes
+ */
+let refreshInterval = null;
+
+function startAutoRefresh(intervalMs = 300000) {
+    if (refreshInterval) clearInterval(refreshInterval);
+    refreshInterval = setInterval(refreshDashboard, intervalMs);
+    console.log(`Auto-refresh started (every ${intervalMs / 1000}s)`);
+}
+
+function stopAutoRefresh() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+        console.log('Auto-refresh stopped');
+    }
+}
+
+// ==========================================
+// BROWSER NOTIFICATIONS
+// ==========================================
+
+/**
+ * Request notification permission
+ */
+async function requestNotificationPermission() {
+    if ('Notification' in window) {
+        const permission = await Notification.requestPermission();
+        return permission === 'granted';
+    }
+    return false;
+}
+
+/**
+ * Show browser notification
+ */
+function showBrowserNotification(title, body, icon = '🌍') {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, {
+            body: body,
+            icon: '/static/images/logo.png',
+            badge: '/static/images/badge.png',
+            tag: 'pollution-alert',
+            requireInteraction: true
+        });
+    }
+}
+
+/**
+ * Check pollution levels and notify if dangerous
+ */
+function checkAndNotify(data) {
+    if (!data) return;
+
+    if (data.aqi && data.aqi >= 200) {
+        showBrowserNotification(
+            '🚨 Severe Air Quality Alert',
+            `AQI has reached ${data.aqi}. Avoid outdoor activities!`
+        );
+    } else if (data.aqi && data.aqi >= 150) {
+        showBrowserNotification(
+            '⚠️ Poor Air Quality Warning',
+            `AQI is ${data.aqi}. Sensitive groups should stay indoors.`
+        );
+    }
+}
+
+// ==========================================
+// EXPORT & DOWNLOAD FUNCTIONS
+// ==========================================
+
+/**
+ * Export data to CSV
+ */
+function exportToCSV(data, filename) {
+    if (!data || data.length === 0) {
+        alert('No data to export');
+        return;
+    }
+
+    const headers = Object.keys(data[0]);
+    const csvContent = [
+        headers.join(','),
+        ...data.map(row => headers.map(h => row[h] || '').join(','))
+    ].join('\n');
+
+    downloadFile(csvContent, filename, 'text/csv');
+}
+
+/**
+ * Download file helper
+ */
+function downloadFile(content, filename, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+/**
+ * Print current page
+ */
+function printPage() {
+    window.print();
+}
+
+// ==========================================
+// LOADING STATES
+// ==========================================
+
+/**
+ * Show loading skeleton
+ */
+function showLoading(elementId) {
+    const el = document.getElementById(elementId);
+    if (el) {
+        el.classList.add('loading');
+        el.innerHTML = `
+            <div class="skeleton-loader">
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line short"></div>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Hide loading state
+ */
+function hideLoading(elementId) {
+    const el = document.getElementById(elementId);
+    if (el) {
+        el.classList.remove('loading');
+    }
+}
+
+// ==========================================
+// INITIALIZATION ENHANCEMENTS
+// ==========================================
+
+// Request notification permission on load
+document.addEventListener('DOMContentLoaded', function () {
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+        // Don't request immediately, wait for user interaction
+        document.body.addEventListener('click', function () {
+            requestNotificationPermission();
+        }, { once: true });
+    }
+
+    // Start auto-refresh on dashboard
+    if (window.location.pathname === '/' || window.location.pathname === '/dashboard') {
+        startAutoRefresh(300000); // 5 minutes
+    }
+});
+
+// Export new functions
+window.fetchRealtimeData = fetchRealtimeData;
+window.fetchForecast = fetchForecast;
+window.refreshDashboard = refreshDashboard;
+window.startAutoRefresh = startAutoRefresh;
+window.stopAutoRefresh = stopAutoRefresh;
+window.requestNotificationPermission = requestNotificationPermission;
+window.showBrowserNotification = showBrowserNotification;
+window.exportToCSV = exportToCSV;
+window.printPage = printPage;

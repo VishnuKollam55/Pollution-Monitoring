@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Compare pollution levels across multiple cities">
+    <title>City Comparison - Pollution Monitoring System</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <span class="logo-icon">🌍</span>
+                    <h1>Pollution Monitor<small>Smart City System</small></h1>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="{{ url_for('air_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🌫️</span>
+                    <span class="nav-text">Air Pollution</span>
+                </a>
+                <a href="{{ url_for('water_pollution') }}" class="nav-item">
+                    <span class="nav-icon">💧</span>
+                    <span class="nav-text">Water Pollution</span>
+                </a>
+                <a href="{{ url_for('noise_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🔊</span>
+                    <span class="nav-text">Noise Pollution</span>
+                </a>
+                <a href="{{ url_for('compare_page') }}" class="nav-item active">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">City Comparison</span>
+                </a>
+                <a href="{{ url_for('analytics') }}" class="nav-item">
+                    <span class="nav-icon">📉</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="{{ url_for('reports') }}" class="nav-item">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">Reports</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <header class="page-header">
+                <div>
+                    <h1 class="page-title">🏙️ City Pollution Comparison</h1>
+                    <p class="page-subtitle">Compare pollution levels across multiple metro cities</p>
+                </div>
+                <div class="page-actions">
+                    <div class="realtime-indicator">
+                        <span class="pulse-dot"></span>
+                        <span>Real-time Data</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- City Selection -->
+            <section class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <span class="card-icon">🔍</span>
+                        Select Cities to Compare
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form id="compareForm" class="compare-form">
+                        <div class="city-checkboxes">
+                            {% for city in cities %}
+                            <label class="city-checkbox">
+                                <input type="checkbox" name="cities" value="{{ city.city }}" {% if city.city in
+                                    selected_cities %}checked{% endif %}>
+                                <span class="checkbox-label">
+                                    <span class="city-name">{{ city.city }}</span>
+                                    <span class="city-state">{{ city.state }}</span>
+                                </span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-chart-bar"></i> Compare Cities
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            {% if comparison_data %}
+            <!-- Comparison Results -->
+            <div class="comparison-results">
+                <!-- Summary Cards Row -->
+                <section class="comparison-summary">
+                    {% for city, data in comparison_data.items() %}
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <h4>{{ city }}</h4>
+                            <span class="city-rank rank-{{ loop.index }}">
+                                {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{%
+                                else %}#{{ loop.index }}{% endif %}
+                            </span>
+                        </div>
+                        <div class="comparison-metrics">
+                            <div class="metric air">
+                                <span class="metric-label">AQI</span>
+                                <span
+                                    class="metric-value {% if data.air.avg_aqi <= 50 %}good{% elif data.air.avg_aqi <= 100 %}moderate{% elif data.air.avg_aqi <= 150 %}poor{% else %}severe{% endif %}">
+                                    {{ data.air.avg_aqi }}
+                                </span>
+                            </div>
+                            <div class="metric water">
+                                <span class="metric-label">pH</span>
+                                <span
+                                    class="metric-value {% if data.water.avg_ph >= 6.5 and data.water.avg_ph <= 8.5 %}good{% else %}poor{% endif %}">
+                                    {{ data.water.avg_ph }}
+                                </span>
+                            </div>
+                            <div class="metric noise">
+                                <span class="metric-label">Noise (dB)</span>
+                                <span
+                                    class="metric-value {% if data.noise.avg_level < 55 %}good{% elif data.noise.avg_level < 75 %}moderate{% else %}severe{% endif %}">
+                                    {{ data.noise.avg_level }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="pollution-score">
+                            <span class="score-label">Overall Score</span>
+                            <div class="score-bar">
+                                <div class="score-fill" style="width: {{ (100 - (data.air.avg_aqi / 3)) | int }}%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </section>
+
+                <!-- Comparison Charts -->
+                <div class="comparison-charts">
+                    <!-- Air Quality Comparison -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-icon">🌫️</span>
+                                Air Quality Index Comparison
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="aqiCompareChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Radar Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-icon">📊</span>
+                                Pollution Metrics Radar
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="radarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Water Quality Comparison -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-icon">💧</span>
+                                Water Quality Parameters
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="waterCompareChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Noise Level Comparison -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-icon">🔊</span>
+                                Noise Level Comparison
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="noiseCompareChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historical Trend Comparison -->
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-icon">📈</span>
+                            Historical AQI Trend Comparison
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 350px;">
+                            <canvas id="trendCompareChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- City Rankings Table -->
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-icon">🏆</span>
+                            City Pollution Rankings
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="data-table rankings-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>City</th>
+                                    <th>Avg AQI</th>
+                                    <th>PM2.5</th>
+                                    <th>PM10</th>
+                                    <th>Water pH</th>
+                                    <th>Noise (dB)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for city, data in comparison_data.items() %}
+                                <tr>
+                                    <td>
+                                        <span class="rank-badge">{{ loop.index }}</span>
+                                    </td>
+                                    <td><strong>{{ city }}</strong></td>
+                                    <td>{{ data.air.avg_aqi }}</td>
+                                    <td>{{ data.air.avg_pm25 }}</td>
+                                    <td>{{ data.air.avg_pm10 }}</td>
+                                    <td>{{ data.water.avg_ph }}</td>
+                                    <td>{{ data.noise.avg_level }}</td>
+                                    <td>
+                                        {% if data.air.avg_aqi <= 50 %} <span class="status-badge good">Good</span>
+                                            {% elif data.air.avg_aqi <= 100 %} <span class="status-badge moderate">
+                                                Moderate</span>
+                                                {% elif data.air.avg_aqi <= 150 %} <span class="status-badge poor">
+                                                    Poor</span>
+                                                    {% elif data.air.avg_aqi <= 200 %} <span
+                                                        class="status-badge very-poor">Very Poor</span>
+                                                        {% else %}
+                                                        <span class="status-badge severe">Severe</span>
+                                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- No Selection Message -->
+            <div class="empty-state">
+                <div class="empty-icon">📊</div>
+                <h3>Select Cities to Compare</h3>
+                <p>Choose 2 or more cities from the list above to see a detailed pollution comparison.</p>
+            </div>
+            {% endif %}
+
+            <!-- Footer -->
+            <footer
+                style="text-align: center; padding: 30px 0; color: var(--text-muted); margin-top: 30px; border-top: 1px solid var(--border-color);">
+                <p>Integrated Pollution Monitoring and Control System &copy; 2026</p>
+                <p style="font-size: 0.85rem;">MCA Final Year Project - Smart City Initiative</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% if comparison_data %}
+    <script>
+        // Parse comparison data from Flask
+        const comparisonData = {{ comparison_data | tojson | safe }};
+        const historicalTrends = {{ historical_trends | tojson | safe }};
+
+        // Chart colors
+        const cityColors = {
+            'Mumbai': { bg: 'rgba(52, 152, 219, 0.7)', border: '#3498db' },
+            'Delhi': { bg: 'rgba(231, 76, 60, 0.7)', border: '#e74c3c' },
+            'Bangalore': { bg: 'rgba(46, 204, 113, 0.7)', border: '#2ecc71' },
+            'Chennai': { bg: 'rgba(155, 89, 182, 0.7)', border: '#9b59b6' },
+            'Kolkata': { bg: 'rgba(241, 196, 15, 0.7)', border: '#f1c40f' },
+            'Hyderabad': { bg: 'rgba(230, 126, 34, 0.7)', border: '#e67e22' }
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const cities = Object.keys(comparisonData);
+
+            // AQI Comparison Bar Chart
+            const aqiCtx = document.getElementById('aqiCompareChart');
+            if (aqiCtx) {
+                new Chart(aqiCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: cities,
+                        datasets: [{
+                            label: 'Average AQI',
+                            data: cities.map(city => comparisonData[city].air.avg_aqi),
+                            backgroundColor: cities.map(city => cityColors[city]?.bg || 'rgba(52, 152, 219, 0.7)'),
+                            borderColor: cities.map(city => cityColors[city]?.border || '#3498db'),
+                            borderWidth: 2,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 300,
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Radar Chart
+            const radarCtx = document.getElementById('radarChart');
+            if (radarCtx) {
+                new Chart(radarCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['AQI', 'PM2.5', 'PM10', 'Water pH', 'Noise Level'],
+                        datasets: cities.map(city => ({
+                            label: city,
+                            data: [
+                                comparisonData[city].air.avg_aqi / 3,
+                                comparisonData[city].air.avg_pm25,
+                                comparisonData[city].air.avg_pm10 / 2,
+                                comparisonData[city].water.avg_ph * 10,
+                                comparisonData[city].noise.avg_level
+                            ],
+                            backgroundColor: cityColors[city]?.bg.replace('0.7', '0.2') || 'rgba(52, 152, 219, 0.2)',
+                            borderColor: cityColors[city]?.border || '#3498db',
+                            borderWidth: 2
+                        }))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Water Quality Grouped Bar Chart
+            const waterCtx = document.getElementById('waterCompareChart');
+            if (waterCtx) {
+                new Chart(waterCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: cities,
+                        datasets: [
+                            {
+                                label: 'pH Level',
+                                data: cities.map(city => comparisonData[city].water.avg_ph),
+                                backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                                borderColor: '#2ecc71',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'Turbidity (NTU)',
+                                data: cities.map(city => comparisonData[city].water.avg_turbidity),
+                                backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                                borderColor: '#3498db',
+                                borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Noise Level Horizontal Bar Chart
+            const noiseCtx = document.getElementById('noiseCompareChart');
+            if (noiseCtx) {
+                new Chart(noiseCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: cities,
+                        datasets: [{
+                            label: 'Average Noise Level (dB)',
+                            data: cities.map(city => comparisonData[city].noise.avg_level),
+                            backgroundColor: cities.map(city => {
+                                const level = comparisonData[city].noise.avg_level;
+                                if (level < 55) return 'rgba(46, 204, 113, 0.7)';
+                                if (level < 75) return 'rgba(241, 196, 15, 0.7)';
+                                return 'rgba(231, 76, 60, 0.7)';
+                            }),
+                            borderWidth: 0,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 100,
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Historical Trend Line Chart
+            const trendCtx = document.getElementById('trendCompareChart');
+            if (trendCtx && historicalTrends) {
+                const datasets = Object.keys(historicalTrends).map(city => ({
+                    label: city,
+                    data: historicalTrends[city].map(d => d.aqi),
+                    borderColor: cityColors[city]?.border || '#3498db',
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    pointRadius: 4
+                }));
+
+                // Get dates from first city
+                const firstCity = Object.keys(historicalTrends)[0];
+                const labels = historicalTrends[firstCity]?.map(d => d.date) || [];
+
+                new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        plugins: {
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        // Form submission handler
+        document.getElementById('compareForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const checkboxes = document.querySelectorAll('input[name="cities"]:checked');
+            if (checkboxes.length < 2) {
+                alert('Please select at least 2 cities to compare');
+                return;
+            }
+
+            const cities = Array.from(checkboxes).map(cb => cb.value);
+            const params = cities.map(c => 'cities=' + encodeURIComponent(c)).join('&');
+            window.location.href = '/compare?' + params;
+        });
+    </script>
+    {% else %}
+    <script>
+        document.getElementById('compareForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const checkboxes = document.querySelectorAll('input[name="cities"]:checked');
+            if (checkboxes.length < 2) {
+                alert('Please select at least 2 cities to compare');
+                return;
+            }
+
+            const cities = Array.from(checkboxes).map(cb => cb.value);
+            const params = cities.map(c => 'cities=' + encodeURIComponent(c)).join('&');
+            window.location.href = '/compare?' + params;
+        });
+    </script>
+    {% endif %}
+</body>
+
+</html>

@@ -1,43 +1,80 @@
 date,city,state,ph,turbidity,dissolved_oxygen,quality
-2026-01-01,Mumbai,Maharashtra,7.2,3.5,8.5,Safe
-2026-01-01,Delhi,Delhi,6.5,8.5,6.2,Moderate
-2026-01-01,Bangalore,Karnataka,7.5,2.5,9.0,Safe
-2026-01-01,Chennai,Tamil Nadu,7.0,4.5,7.8,Safe
-2026-01-01,Kolkata,West Bengal,6.6,7.0,6.8,Moderate
-2026-01-01,Hyderabad,Telangana,7.1,4.0,8.2,Safe
-2026-01-02,Mumbai,Maharashtra,7.0,4.2,8.0,Safe
-2026-01-02,Delhi,Delhi,6.2,12.5,5.5,Polluted
-2026-01-02,Bangalore,Karnataka,7.6,2.2,9.2,Safe
-2026-01-02,Chennai,Tamil Nadu,6.9,5.0,7.5,Moderate
-2026-01-02,Kolkata,West Bengal,6.4,8.0,6.5,Polluted
-2026-01-02,Hyderabad,Telangana,7.0,4.5,8.0,Safe
-2026-01-03,Mumbai,Maharashtra,6.8,5.5,7.5,Moderate
-2026-01-03,Delhi,Delhi,5.8,18.0,4.5,Polluted
-2026-01-03,Bangalore,Karnataka,7.4,2.8,8.8,Safe
-2026-01-03,Chennai,Tamil Nadu,6.8,5.5,7.2,Moderate
-2026-01-03,Kolkata,West Bengal,6.2,10.0,5.8,Polluted
-2026-01-03,Hyderabad,Telangana,6.9,5.2,7.6,Moderate
-2026-01-04,Mumbai,Maharashtra,7.1,3.8,8.2,Safe
-2026-01-04,Delhi,Delhi,5.9,16.0,4.8,Polluted
-2026-01-04,Bangalore,Karnataka,7.3,3.0,8.5,Safe
-2026-01-04,Chennai,Tamil Nadu,7.0,4.0,7.8,Safe
-2026-01-04,Kolkata,West Bengal,6.3,9.5,6.0,Polluted
-2026-01-04,Hyderabad,Telangana,7.0,4.2,8.0,Safe
-2026-01-05,Mumbai,Maharashtra,7.3,3.2,8.8,Safe
-2026-01-05,Delhi,Delhi,6.0,14.5,5.0,Polluted
-2026-01-05,Bangalore,Karnataka,7.5,2.5,9.0,Safe
-2026-01-05,Chennai,Tamil Nadu,6.8,5.8,7.0,Moderate
-2026-01-05,Kolkata,West Bengal,6.5,8.5,6.5,Moderate
-2026-01-05,Hyderabad,Telangana,7.1,4.0,8.2,Safe
-2026-01-06,Mumbai,Maharashtra,7.4,3.0,8.9,Safe
-2026-01-06,Delhi,Delhi,6.2,11.0,5.5,Polluted
-2026-01-06,Bangalore,Karnataka,7.6,2.0,9.3,Safe
-2026-01-06,Chennai,Tamil Nadu,7.0,4.2,7.8,Safe
-2026-01-06,Kolkata,West Bengal,6.6,7.5,6.8,Moderate
-2026-01-06,Hyderabad,Telangana,7.2,3.8,8.4,Safe
-2026-01-07,Mumbai,Maharashtra,7.5,2.8,9.0,Safe
-2026-01-07,Delhi,Delhi,6.4,9.0,6.0,Moderate
-2026-01-07,Bangalore,Karnataka,7.4,2.5,8.8,Safe
-2026-01-07,Chennai,Tamil Nadu,7.2,3.5,8.2,Safe
-2026-01-07,Kolkata,West Bengal,6.7,6.5,7.0,Moderate
-2026-01-07,Hyderabad,Telangana,7.3,3.5,8.5,Safe
+2026-01-01,Mumbai,Maharashtra,7.2,2.5,7.8,Safe
+2026-01-01,Delhi,Delhi,7.8,5.2,5.5,Moderate
+2026-01-01,Bangalore,Karnataka,7.0,1.8,8.2,Safe
+2026-01-01,Chennai,Tamil Nadu,7.5,3.5,7.0,Safe
+2026-01-01,Kolkata,West Bengal,7.6,4.8,6.2,Moderate
+2026-01-01,Hyderabad,Telangana,7.3,2.8,7.5,Safe
+2026-01-01,Pune,Maharashtra,7.1,2.2,7.9,Safe
+2026-01-01,Ahmedabad,Gujarat,7.8,3.8,6.8,Safe
+2026-01-01,Jaipur,Rajasthan,8.0,4.5,6.5,Moderate
+2026-01-01,Lucknow,Uttar Pradesh,7.9,5.5,5.8,Moderate
+2026-01-01,Kanpur,Uttar Pradesh,8.2,6.5,4.8,Polluted
+2026-01-01,Nagpur,Maharashtra,7.2,2.5,7.6,Safe
+2026-01-01,Visakhapatnam,Andhra Pradesh,7.4,3.0,7.2,Safe
+2026-01-01,Bhopal,Madhya Pradesh,7.5,3.5,6.8,Safe
+2026-01-01,Patna,Bihar,8.0,5.8,5.2,Moderate
+2026-01-01,Indore,Madhya Pradesh,7.3,3.2,7.0,Safe
+2026-01-01,Surat,Gujarat,7.6,3.8,6.5,Safe
+2026-01-01,Kochi,Kerala,6.9,1.5,8.5,Safe
+2026-01-01,Coimbatore,Tamil Nadu,7.2,2.2,7.8,Safe
+2026-01-01,Guwahati,Assam,7.0,2.8,7.5,Safe
+2026-01-01,Chandigarh,Punjab,7.4,3.5,7.0,Safe
+2026-01-01,Thiruvananthapuram,Kerala,6.8,1.2,8.8,Safe
+2026-01-01,Ranchi,Jharkhand,7.5,3.8,6.8,Safe
+2026-01-01,Shimla,Himachal Pradesh,6.9,1.0,9.0,Safe
+2026-01-01,Panaji,Goa,7.1,1.8,8.2,Safe
+2026-01-01,Noida,Uttar Pradesh,8.0,5.5,5.5,Moderate
+2026-01-01,Gurugram,Haryana,7.8,5.2,5.8,Moderate
+2026-01-02,Mumbai,Maharashtra,7.4,2.8,7.5,Safe
+2026-01-02,Delhi,Delhi,8.0,5.8,5.2,Moderate
+2026-01-02,Bangalore,Karnataka,7.2,2.0,8.0,Safe
+2026-01-02,Chennai,Tamil Nadu,7.6,3.8,6.8,Safe
+2026-01-02,Kolkata,West Bengal,7.8,5.2,5.8,Moderate
+2026-01-02,Hyderabad,Telangana,7.4,3.0,7.2,Safe
+2026-01-02,Pune,Maharashtra,7.3,2.5,7.6,Safe
+2026-01-02,Ahmedabad,Gujarat,7.9,4.0,6.5,Moderate
+2026-01-02,Jaipur,Rajasthan,8.2,4.8,6.2,Moderate
+2026-01-02,Lucknow,Uttar Pradesh,8.0,5.8,5.5,Moderate
+2026-01-02,Kanpur,Uttar Pradesh,8.4,7.0,4.5,Polluted
+2026-01-02,Nagpur,Maharashtra,7.4,2.8,7.4,Safe
+2026-01-02,Visakhapatnam,Andhra Pradesh,7.5,3.2,7.0,Safe
+2026-01-02,Bhopal,Madhya Pradesh,7.6,3.8,6.5,Safe
+2026-01-02,Patna,Bihar,8.2,6.2,5.0,Moderate
+2026-01-02,Indore,Madhya Pradesh,7.4,3.5,6.8,Safe
+2026-01-02,Surat,Gujarat,7.8,4.0,6.2,Moderate
+2026-01-02,Kochi,Kerala,7.0,1.8,8.2,Safe
+2026-01-02,Coimbatore,Tamil Nadu,7.3,2.5,7.5,Safe
+2026-01-02,Guwahati,Assam,7.2,3.0,7.2,Safe
+2026-01-02,Chandigarh,Punjab,7.5,3.8,6.8,Safe
+2026-01-02,Thiruvananthapuram,Kerala,6.9,1.5,8.5,Safe
+2026-01-02,Ranchi,Jharkhand,7.6,4.0,6.5,Safe
+2026-01-02,Varanasi,Uttar Pradesh,8.5,7.5,4.2,Polluted
+2026-01-02,Agra,Uttar Pradesh,8.2,6.0,5.0,Moderate
+2026-01-02,Noida,Uttar Pradesh,8.2,5.8,5.2,Moderate
+2026-01-02,Gurugram,Haryana,8.0,5.5,5.5,Moderate
+2026-01-03,Mumbai,Maharashtra,7.5,3.0,7.2,Safe
+2026-01-03,Delhi,Delhi,8.2,6.2,5.0,Moderate
+2026-01-03,Bangalore,Karnataka,7.1,1.8,8.2,Safe
+2026-01-03,Chennai,Tamil Nadu,7.7,4.0,6.5,Safe
+2026-01-03,Kolkata,West Bengal,8.0,5.5,5.5,Moderate
+2026-01-03,Hyderabad,Telangana,7.5,3.2,7.0,Safe
+2026-01-03,Pune,Maharashtra,7.4,2.8,7.4,Safe
+2026-01-03,Ahmedabad,Gujarat,8.0,4.2,6.2,Moderate
+2026-01-03,Jaipur,Rajasthan,8.4,5.0,6.0,Moderate
+2026-01-03,Lucknow,Uttar Pradesh,8.2,6.0,5.2,Moderate
+2026-01-03,Kanpur,Uttar Pradesh,8.5,7.2,4.2,Polluted
+2026-01-03,Nagpur,Maharashtra,7.5,3.0,7.2,Safe
+2026-01-03,Visakhapatnam,Andhra Pradesh,7.6,3.5,6.8,Safe
+2026-01-03,Bhopal,Madhya Pradesh,7.8,4.0,6.2,Moderate
+2026-01-03,Patna,Bihar,8.4,6.5,4.8,Polluted
+2026-01-03,Indore,Madhya Pradesh,7.5,3.8,6.5,Safe
+2026-01-03,Surat,Gujarat,7.9,4.2,6.0,Moderate
+2026-01-03,Kochi,Kerala,7.1,2.0,8.0,Safe
+2026-01-03,Coimbatore,Tamil Nadu,7.4,2.8,7.2,Safe
+2026-01-03,Mangalore,Karnataka,7.0,1.5,8.5,Safe
+2026-01-03,Mysore,Karnataka,7.1,1.8,8.2,Safe
+2026-01-03,Udaipur,Rajasthan,7.5,3.5,6.8,Safe
+2026-01-03,Jodhpur,Rajasthan,8.0,4.5,6.2,Moderate
+2026-01-03,Ludhiana,Punjab,8.0,5.0,5.5,Moderate
+2026-01-03,Amritsar,Punjab,7.8,4.8,5.8,Moderate

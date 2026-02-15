@@ -2125,3 +2125,617 @@ select {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-secondary);
 }
+
+/* ==========================================
+   CITY COMPARISON STYLES
+   ========================================== */
+
+/* Compare Form */
+.compare-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.city-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.city-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    padding: var(--spacing-md);
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+    transition: all var(--transition-fast);
+}
+
+.city-checkbox:hover {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: var(--primary-light);
+}
+
+.city-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-light);
+}
+
+.city-checkbox input[type="checkbox"]:checked + .checkbox-label {
+    color: var(--text-primary);
+}
+
+.checkbox-label {
+    display: flex;
+    flex-direction: column;
+    color: var(--text-secondary);
+}
+
+.checkbox-label .city-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.checkbox-label .city-state {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Comparison Summary Cards */
+.comparison-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.comparison-card {
+    background: var(--gradient-card);
+    backdrop-filter: var(--glass-blur);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--glass-border);
+    transition: all var(--transition-normal);
+}
+
+.comparison-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.comparison-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.comparison-card-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.city-rank {
+    font-size: 1.25rem;
+}
+
+.comparison-metrics {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.comparison-metrics .metric {
+    text-align: center;
+    padding: var(--spacing-sm);
+    flex: 1;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-md);
+}
+
+.metric-label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.metric-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.metric-value.good {
+    color: var(--status-good);
+}
+
+.metric-value.moderate {
+    color: var(--status-moderate);
+}
+
+.metric-value.poor {
+    color: var(--status-poor);
+}
+
+.metric-value.severe {
+    color: var(--status-severe);
+}
+
+.pollution-score {
+    margin-top: var(--spacing-sm);
+}
+
+.score-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.score-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.score-fill {
+    height: 100%;
+    background: var(--gradient-success);
+    border-radius: var(--radius-full);
+    transition: width var(--transition-normal);
+}
+
+/* Comparison Charts Grid */
+.comparison-charts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+}
+
+/* Rankings Table Enhancements */
+.rankings-table {
+    width: 100%;
+}
+
+.rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-2xl) * 2;
+    color: var(--text-secondary);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-lg);
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+/* ==========================================
+   ANALYTICS DASHBOARD STYLES
+   ========================================== */
+
+.analytics-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.metric-card {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    transition: all var(--transition-normal);
+}
+
+.metric-card:hover {
+    transform: translateY(-4px);
+}
+
+.metric-card.gradient-blue {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.3) 0%, rgba(52, 152, 219, 0.1) 100%);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+.metric-card.gradient-green {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.3) 0%, rgba(46, 204, 113, 0.1) 100%);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.metric-card.gradient-orange {
+    background: linear-gradient(135deg, rgba(230, 126, 34, 0.3) 0%, rgba(230, 126, 34, 0.1) 100%);
+    border: 1px solid rgba(230, 126, 34, 0.3);
+}
+
+.metric-card.gradient-purple {
+    background: linear-gradient(135deg, rgba(155, 89, 182, 0.3) 0%, rgba(155, 89, 182, 0.1) 100%);
+    border: 1px solid rgba(155, 89, 182, 0.3);
+}
+
+.metric-icon {
+    font-size: 2.5rem;
+}
+
+.metric-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-card .metric-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.metric-card .metric-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+/* Rankings Grid */
+.rankings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.ranking-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.ranking-item:hover {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.rank-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    width: 40px;
+    text-align: center;
+}
+
+.rank-city {
+    flex: 1;
+}
+
+.rank-city strong {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.rank-state {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.rank-aqi {
+    text-align: center;
+    min-width: 60px;
+}
+
+.aqi-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: block;
+}
+
+.aqi-value.good {
+    color: var(--status-good);
+}
+
+.aqi-value.moderate {
+    color: var(--status-moderate);
+}
+
+.aqi-value.poor {
+    color: var(--status-poor);
+}
+
+.aqi-value.severe {
+    color: var(--status-severe);
+}
+
+.aqi-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.rank-bar {
+    width: 150px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.rank-bar .bar-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width var(--transition-normal);
+}
+
+.rank-bar .bar-fill.good {
+    background: var(--status-good);
+}
+
+.rank-bar .bar-fill.moderate {
+    background: var(--status-moderate);
+}
+
+.rank-bar .bar-fill.poor {
+    background: var(--status-poor);
+}
+
+.rank-bar .bar-fill.severe {
+    background: var(--status-severe);
+}
+
+/* Analytics Charts Grid */
+.analytics-charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+}
+
+/* Predictions Grid */
+.predictions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.prediction-card {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--glass-border);
+}
+
+.prediction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.prediction-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.prediction-type {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: rgba(99, 102, 241, 0.2);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+}
+
+.prediction-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+}
+
+.prediction-current,
+.prediction-forecast {
+    text-align: center;
+}
+
+.prediction-current .label,
+.prediction-forecast .label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.prediction-current .value,
+.prediction-forecast .value {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.prediction-current .value.good,
+.prediction-forecast .value.good {
+    color: var(--status-good);
+}
+
+.prediction-current .value.poor,
+.prediction-forecast .value.poor {
+    color: var(--status-very-poor);
+}
+
+.prediction-arrow {
+    font-size: 1.5rem;
+}
+
+.prediction-arrow .text-danger {
+    color: var(--status-very-poor);
+}
+
+.prediction-arrow .text-success {
+    color: var(--status-good);
+}
+
+.prediction-arrow .text-warning {
+    color: var(--status-moderate);
+}
+
+.prediction-confidence {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.confidence-bar {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    margin-top: 4px;
+    overflow: hidden;
+}
+
+.confidence-bar .bar-fill {
+    height: 100%;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-full);
+}
+
+/* Real-time Status Grid */
+.realtime-status-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.status-icon {
+    font-size: 0.8rem;
+}
+
+.status-icon.online {
+    color: var(--status-good);
+}
+
+.status-icon.offline {
+    color: var(--status-very-poor);
+}
+
+.status-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.status-value {
+    margin-left: auto;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.last-updated {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+}
+
+/* Real-time Indicator */
+.realtime-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: rgba(46, 204, 113, 0.15);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+    border-radius: var(--radius-full);
+    color: var(--status-good);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--status-good);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+    .comparison-charts,
+    .analytics-charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .analytics-metrics {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .realtime-status-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .analytics-metrics {
+        grid-template-columns: 1fr;
+    }
+    
+    .comparison-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .realtime-status-grid {
+        grid-template-columns: 1fr;
+    }
+}

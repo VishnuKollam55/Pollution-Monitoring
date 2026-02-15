@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Pollution Analytics Dashboard - Comprehensive insights and trends">
+    <title>Analytics Dashboard - Pollution Monitoring System</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <span class="logo-icon">🌍</span>
+                    <h1>Pollution Monitor<small>Smart City System</small></h1>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="{{ url_for('air_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🌫️</span>
+                    <span class="nav-text">Air Pollution</span>
+                </a>
+                <a href="{{ url_for('water_pollution') }}" class="nav-item">
+                    <span class="nav-icon">💧</span>
+                    <span class="nav-text">Water Pollution</span>
+                </a>
+                <a href="{{ url_for('noise_pollution') }}" class="nav-item">
+                    <span class="nav-icon">🔊</span>
+                    <span class="nav-text">Noise Pollution</span>
+                </a>
+                <a href="{{ url_for('compare_page') }}" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">City Comparison</span>
+                </a>
+                <a href="{{ url_for('analytics') }}" class="nav-item active">
+                    <span class="nav-icon">📉</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="{{ url_for('reports') }}" class="nav-item">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">Reports</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <header class="page-header">
+                <div>
+                    <h1 class="page-title">📉 Analytics Dashboard</h1>
+                    <p class="page-subtitle">Comprehensive pollution insights and ML predictions</p>
+                </div>
+                <div class="page-actions">
+                    <div class="realtime-indicator">
+                        <span class="pulse-dot"></span>
+                        <span>Live Analytics</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Key Metrics Row -->
+            <section class="analytics-metrics">
+                <div class="metric-card gradient-blue">
+                    <div class="metric-icon">🏙️</div>
+                    <div class="metric-content">
+                        <span class="metric-value">{{ total_cities }}</span>
+                        <span class="metric-label">Cities Monitored</span>
+                    </div>
+                </div>
+                <div class="metric-card gradient-green">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-content">
+                        <span class="metric-value">{{ total_records }}</span>
+                        <span class="metric-label">Data Points</span>
+                    </div>
+                </div>
+                <div class="metric-card gradient-orange">
+                    <div class="metric-icon">⚠️</div>
+                    <div class="metric-content">
+                        <span class="metric-value">{{ high_pollution_days }}</span>
+                        <span class="metric-label">High Pollution Days</span>
+                    </div>
+                </div>
+                <div class="metric-card gradient-purple">
+                    <div class="metric-icon">🤖</div>
+                    <div class="metric-content">
+                        <span class="metric-value">{{ predictions_made }}</span>
+                        <span class="metric-label">ML Predictions</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- City Rankings Section -->
+            <section class="analytics-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-icon">🏆</span>
+                            City Pollution Rankings (Best to Worst)
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="rankings-grid">
+                            {% for city in city_rankings %}
+                            <div class="ranking-item rank-{{ loop.index }}">
+                                <div class="rank-number">
+                                    {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{%
+                                    else %}{{ loop.index }}{% endif %}
+                                </div>
+                                <div class="rank-city">
+                                    <strong>{{ city.city }}</strong>
+                                    <span class="rank-state">{{ city.state }}</span>
+                                </div>
+                                <div class="rank-aqi">
+                                    <span
+                                        class="aqi-value {% if city.avg_aqi <= 50 %}good{% elif city.avg_aqi <= 100 %}moderate{% elif city.avg_aqi <= 150 %}poor{% else %}severe{% endif %}">
+                                        {{ city.avg_aqi }}
+                                    </span>
+                                    <span class="aqi-label">AQI</span>
+                                </div>
+                                <div class="rank-bar">
+                                    <div class="bar-fill {% if city.avg_aqi <= 50 %}good{% elif city.avg_aqi <= 100 %}moderate{% elif city.avg_aqi <= 150 %}poor{% else %}severe{% endif %}"
+                                        style="width: {{ (city.avg_aqi / 3) | int }}%"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Grid -->
+            <div class="analytics-charts-grid">
+                <!-- Pollution Distribution Pie Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-icon">🥧</span>
+                            AQI Level Distribution
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 280px;">
+                            <canvas id="aqiDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Trend -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-icon">📈</span>
+                            Weekly Pollution Trend
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 280px;">
+                            <canvas id="weeklyTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pollution by City -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-icon">🌆</span>
+                            Average AQI by City
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 280px;">
+                            <canvas id="cityAqiChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Water Quality Distribution -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-icon">💧</span>
+                            Water Quality Distribution
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 280px;">
+                            <canvas id="waterQualityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ML Predictions Section -->
+            <section class="analytics-section" style="margin-top: 20px;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-icon">🤖</span>
+                            ML Prediction Insights
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="predictions-grid">
+                            {% for city in prediction_insights %}
+                            <div class="prediction-card">
+                                <div class="prediction-header">
+                                    <h4>{{ city.city }}</h4>
+                                    <span class="prediction-type">7-Day Forecast</span>
+                                </div>
+                                <div class="prediction-body">
+                                    <div class="prediction-current">
+                                        <span class="label">Current AQI</span>
+                                        <span
+                                            class="value {% if city.current_aqi <= 100 %}good{% else %}poor{% endif %}">{{
+                                            city.current_aqi }}</span>
+                                    </div>
+                                    <div class="prediction-arrow">
+                                        {% if city.predicted_trend == 'up' %}
+                                        <i class="fas fa-arrow-up text-danger"></i>
+                                        {% elif city.predicted_trend == 'down' %}
+                                        <i class="fas fa-arrow-down text-success"></i>
+                                        {% else %}
+                                        <i class="fas fa-minus text-warning"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="prediction-forecast">
+                                        <span class="label">Predicted AQI</span>
+                                        <span
+                                            class="value {% if city.predicted_aqi <= 100 %}good{% else %}poor{% endif %}">{{
+                                            city.predicted_aqi }}</span>
+                                    </div>
+                                </div>
+                                <div class="prediction-confidence">
+                                    <span>Confidence: {{ city.confidence }}%</span>
+                                    <div class="confidence-bar">
+                                        <div class="bar-fill" style="width: {{ city.confidence }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Real-time Data Status -->
+            <section class="analytics-section" style="margin-top: 20px;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-icon">🔄</span>
+                            Real-time Data Status
+                        </h3>
+                        <button class="btn btn-sm btn-primary" onclick="refreshData()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="realtime-status-grid">
+                            <div class="status-item">
+                                <span class="status-icon online">●</span>
+                                <span class="status-label">Air Quality API</span>
+                                <span class="status-value">Connected</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-icon online">●</span>
+                                <span class="status-label">Weather Service</span>
+                                <span class="status-value">Simulated</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-icon online">●</span>
+                                <span class="status-label">ML Models</span>
+                                <span class="status-value">{{ 'Active' if ml_models_active else 'Fallback Mode'
+                                    }}</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-icon online">●</span>
+                                <span class="status-label">Database</span>
+                                <span class="status-value">SQLite Active</span>
+                            </div>
+                        </div>
+                        <div class="last-updated">
+                            Last updated: <span id="lastUpdated">{{ current_time }}</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer
+                style="text-align: center; padding: 30px 0; color: var(--text-muted); margin-top: 30px; border-top: 1px solid var(--border-color);">
+                <p>Integrated Pollution Monitoring and Control System &copy; 2026</p>
+                <p style="font-size: 0.85rem;">MCA Final Year Project - Smart City Initiative</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Parse analytics data from Flask
+        const aqiDistribution = {{ aqi_distribution | tojson | safe }};
+        const weeklyTrend = {{ weekly_trend | tojson | safe }};
+        const cityAqiData = {{ city_aqi_data | tojson | safe }};
+        const waterQualityData = {{ water_quality_data | tojson | safe }};
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // AQI Level Distribution Pie Chart
+            const aqiDistCtx = document.getElementById('aqiDistributionChart');
+            if (aqiDistCtx) {
+                new Chart(aqiDistCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Good', 'Moderate', 'Poor', 'Very Poor', 'Severe'],
+                        datasets: [{
+                            data: [
+                                aqiDistribution.good || 0,
+                                aqiDistribution.moderate || 0,
+                                aqiDistribution.poor || 0,
+                                aqiDistribution.very_poor || 0,
+                                aqiDistribution.severe || 0
+                            ],
+                            backgroundColor: [
+                                'rgba(46, 204, 113, 0.8)',
+                                'rgba(241, 196, 15, 0.8)',
+                                'rgba(230, 126, 34, 0.8)',
+                                'rgba(231, 76, 60, 0.8)',
+                                'rgba(142, 68, 173, 0.8)'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Weekly Trend Area Chart
+            const weeklyCtx = document.getElementById('weeklyTrendChart');
+            if (weeklyCtx) {
+                new Chart(weeklyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: weeklyTrend.map(d => d.date),
+                        datasets: [{
+                            label: 'Average AQI',
+                            data: weeklyTrend.map(d => d.avg_aqi),
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // City AQI Bar Chart
+            const cityCtx = document.getElementById('cityAqiChart');
+            if (cityCtx) {
+                const colors = cityAqiData.map(d => {
+                    if (d.avg_aqi <= 50) return 'rgba(46, 204, 113, 0.8)';
+                    if (d.avg_aqi <= 100) return 'rgba(241, 196, 15, 0.8)';
+                    if (d.avg_aqi <= 150) return 'rgba(230, 126, 34, 0.8)';
+                    return 'rgba(231, 76, 60, 0.8)';
+                });
+
+                new Chart(cityCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: cityAqiData.map(d => d.city),
+                        datasets: [{
+                            label: 'Average AQI',
+                            data: cityAqiData.map(d => d.avg_aqi),
+                            backgroundColor: colors,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Water Quality Pie Chart
+            const waterCtx = document.getElementById('waterQualityChart');
+            if (waterCtx) {
+                new Chart(waterCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Safe', 'Moderate', 'Polluted'],
+                        datasets: [{
+                            data: [
+                                waterQualityData.safe || 0,
+                                waterQualityData.moderate || 0,
+                                waterQualityData.polluted || 0
+                            ],
+                            backgroundColor: [
+                                'rgba(46, 204, 113, 0.8)',
+                                'rgba(241, 196, 15, 0.8)',
+                                'rgba(231, 76, 60, 0.8)'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        // Refresh data function
+        function refreshData() {
+            location.reload();
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+        }, 30000);
+    </script>
+</body>
+
+</html>
